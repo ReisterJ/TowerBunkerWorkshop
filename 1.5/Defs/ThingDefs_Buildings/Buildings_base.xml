@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  
+  
+  <ThingDef Abstract="True" Name="TBW_TowerBase" ParentName="BuildingBase">
+    <!-- <thingClass>Building_Tower</thingClass> -->
+    <drawerType>MapMeshAndRealTime</drawerType>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <blockWind>true</blockWind>
+    <hasInteractionCell>true</hasInteractionCell>
+    <fillPercent>1</fillPercent>
+    <blockLight>true</blockLight>
+    <canOverlapZones>false</canOverlapZones>
+    <rotatable>false</rotatable>
+    <size>(2,2)</size>
+    <building>
+      
+    </building>
+    <damageMultipliers>
+        <li>
+            <damageDef>Flame</damageDef>
+            <multiplier>0</multiplier>
+        </li>
+    </damageMultipliers>
+    <statBases>
+      <MaxHitPoints>600</MaxHitPoints>
+      <Flammability>0</Flammability>
+      <Mass>100</Mass>
+      <Beauty>-5</Beauty>
+      <WorkToBuild>6000</WorkToBuild>
+    </statBases>
+    <stuffCategories>
+        <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>200</costStuffCount>
+    <designationCategory>Security</designationCategory>
+    <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+    <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+  </ThingDef>
+  <ThingDef Abstract="True" Name="TBW_BunkerBase" ParentName="BuildingBase">
+    <!-- <thingClass>Building_Tower</thingClass> -->
+    <drawerType>MapMeshAndRealTime</drawerType>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <blockWind>true</blockWind>
+    <hasInteractionCell>true</hasInteractionCell>
+    <fillPercent>1</fillPercent>
+    <blockLight>true</blockLight>
+    <canOverlapZones>false</canOverlapZones>
+    <size>(2,2)</size>
+    <building>
+      
+    </building>
+    <damageMultipliers>
+        <li>
+            <damageDef>Flame</damageDef>
+            <multiplier>0</multiplier>
+        </li>
+    </damageMultipliers>
+    <statBases>
+      <MaxHitPoints>1200</MaxHitPoints>
+      <Flammability>0</Flammability>
+      <Mass>100</Mass>
+      <Beauty>-5</Beauty>
+      <WorkToBuild>9000</WorkToBuild>
+    </statBases>
+    <stuffCategories>
+        <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>400</costStuffCount>
+    <designationCategory>Security</designationCategory>
+    <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+    <constructionSkillPrerequisite>10</constructionSkillPrerequisite>
+  </ThingDef>
+  <ThingDef Abstract="True" Name="TBW_WorkShopBase" ParentName="BuildingBase">
+    <!-- <thingClass>Building_Tower</thingClass> -->
+    <drawerType>MapMeshAndRealTime</drawerType>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Impassable</passability>
+    <blockWind>true</blockWind>
+    <hasInteractionCell>true</hasInteractionCell>
+    <fillPercent>1</fillPercent>
+    <blockLight>true</blockLight>
+    <canOverlapZones>false</canOverlapZones>
+    <size>(2,2)</size>
+    <building>
+      
+    </building>
+    <!-- <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded> -->
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+  </ThingDef>
+</Defs>

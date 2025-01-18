@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>Tower Bunker Workshop</name>
+	<author>Reister_J</author>
+	<packageId>ReisterJ.TBW</packageId>
+	<supportedVersions>
+		<li>1.5</li>
+	</supportedVersions>
+	<modVersion>1.00</modVersion>
+	<description>
+	Added some buildings for security and production.
+	Settler can garrison the tower and bunker for decent protection and firepower.
+	You can also toss away some people you dont like by throwing them into workshops for some production and better performance(maybe?)
+	</description>
+	<!-- <modDependencies>
+		
+	</modDependencies> -->
+</ModMetaData>

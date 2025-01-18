@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <ThingDef ParentName="TBW_TowerBase">
+        <!-- <thingClass>Building_Tower</thingClass> -->
+        <defName>TBW_WatchTower_Medieval</defName>
+        <label>Medieval watchtower</label>
+        <description>A tower which can be garrisoned.It provides cover for people inside to shoot enemies safely</description>
+        <graphicData>
+            <texPath>Things/Buildings/Towers/tower</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(2,2)</drawSize>
+            <drawOffset>(0,0,-0.16)</drawOffset>
+            <damageData>
+                <rect>(0.3,0.3,1.4,1.4)</rect>
+            </damageData>
+            <shadowData>
+                <volume>(1.5,0.35,1.4)</volume>
+                <offset>(0,0,-0.05)</offset>
+            </shadowData>
+        </graphicData>
+        <costList>
+            <Steel>50</Steel>
+        </costList>
+        <tickerType>Normal</tickerType>
+        <killedLeavings>
+            <ChunkSlagSteel>1</ChunkSlagSteel>
+        </killedLeavings>
+        <comps>
+        </comps>
+    </ThingDef>
+
+    <ThingDef ParentName="BaseWeaponTurret">
+        <defName>TBW_Bow</defName>
+        <label>Bow</label>
+        <description>Medieval watchtower defensive measure.</description>
+        <graphicData>
+            <texPath>Things/Item/Equipment/WeaponRanged/BowGreat</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <tradeability>None</tradeability>
+        <destroyOnDrop>true</destroyOnDrop>
+        <statBases>
+        <Mass>2.6</Mass>
+        <AccuracyTouch>0.95</AccuracyTouch>
+        <AccuracyShort>0.90</AccuracyShort>
+        <AccuracyMedium>0.80</AccuracyMedium>
+        <AccuracyLong>0.6</AccuracyLong>
+        </statBases>
+        <verbs>
+        <li>
+            <verbClass>Verb_Shoot</verbClass>
+            <defaultProjectile>Arrow_Great</defaultProjectile>
+            <range>30.9</range>
+            <soundCast>Shot_ChargeBlaster</soundCast>
+            <soundCastTail>GunTail_Heavy</soundCastTail>
+            <muzzleFlashScale>9</muzzleFlashScale>
+            <defaultCooldownTime>2.0</defaultCooldownTime>
+            <ticksBetweenBurstShots>30</ticksBetweenBurstShots>
+        </li>
+        </verbs>
+    </ThingDef>
+</Defs>
