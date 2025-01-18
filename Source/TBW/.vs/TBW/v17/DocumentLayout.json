@@ -1,0 +1,96 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\tbw\\building_mutliplepawns.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|solutionrelative:tbw\\building_mutliplepawns.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|e:\\workstation\\rimworld\\code\\tower bunker workshop\\tbw\\tbw\\building_tower.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|solutionrelative:tbw\\building_tower.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|e:\\workstation\\rimworld\\code\\tower bunker workshop\\tbw\\tbw\\tbwcomp_garrisonfire.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|solutionrelative:tbw\\tbwcomp_garrisonfire.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|e:\\workstation\\rimworld\\code\\tower bunker workshop\\tbw\\tbw\\tbwcomp_station.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69579614-A6F6-45FD-8EE5-809A86BF3631}|TBW\\TBW.csproj|solutionrelative:tbw\\tbwcomp_station.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TBWComp_Station.cs",
+              "DocumentMoniker": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\TBWComp_Station.cs",
+              "RelativeDocumentMoniker": "TBW\\TBWComp_Station.cs",
+              "ToolTip": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\TBWComp_Station.cs",
+              "RelativeToolTip": "TBW\\TBWComp_Station.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAADwvxIAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-17T18:12:02.598Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TBWComp_GarrisonFire.cs",
+              "DocumentMoniker": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\TBWComp_GarrisonFire.cs",
+              "RelativeDocumentMoniker": "TBW\\TBWComp_GarrisonFire.cs",
+              "ToolTip": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\TBWComp_GarrisonFire.cs",
+              "RelativeToolTip": "TBW\\TBWComp_GarrisonFire.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAADwvyAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-16T16:44:51.538Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Building_Tower.cs",
+              "DocumentMoniker": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\Building_Tower.cs",
+              "RelativeDocumentMoniker": "TBW\\Building_Tower.cs",
+              "ToolTip": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\Building_Tower.cs",
+              "RelativeToolTip": "TBW\\Building_Tower.cs",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAAABUAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-14T09:02:48.402Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Building_MutliplePawns.cs",
+              "DocumentMoniker": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\Building_MutliplePawns.cs",
+              "RelativeDocumentMoniker": "TBW\\Building_MutliplePawns.cs",
+              "ToolTip": "E:\\workstation\\rimworld\\code\\Tower Bunker Workshop\\TBW\\TBW\\Building_MutliplePawns.cs",
+              "RelativeToolTip": "TBW\\Building_MutliplePawns.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAABIAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-15T07:25:16.805Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{269a02dc-6af8-11d3-bdc4-00c04f688e50}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
