@@ -9,7 +9,7 @@ using Verse.AI;
 
 namespace TBW
 {
-    public class TBWComp_GarrisonWeapon : ThingComp,IAttackTargetSearcher
+    public class Comp_TBW_GarrisonWeapon : ThingComp,IAttackTargetSearcher
     {
         protected LocalTargetInfo forcedTarget = LocalTargetInfo.Invalid;
 
@@ -38,11 +38,11 @@ namespace TBW
                 return this.parent;
             }
         }
-        public TBWCompProperties_GarrisonWeapon Props
+        public CompProperties_TBW_GarrisonWeapon Props
         {
             get
             {
-                return (TBWCompProperties_GarrisonWeapon)this.props;
+                return (CompProperties_TBW_GarrisonWeapon)this.props;
             }
         }
         protected void OnAttackedTarget(LocalTargetInfo target)
@@ -199,10 +199,10 @@ namespace TBW
         }
     }
 
-    public class TBWCompProperties_GarrisonWeapon : CompProperties
+    public class CompProperties_TBW_GarrisonWeapon : CompProperties
     {
-        public TBWCompProperties_GarrisonWeapon(){
-            this.compClass = typeof(TBWComp_GarrisonWeapon);
+        public CompProperties_TBW_GarrisonWeapon(){
+            this.compClass = typeof(Comp_TBW_GarrisonWeapon);
         }
 
         public ThingDef MainWeaponDef;

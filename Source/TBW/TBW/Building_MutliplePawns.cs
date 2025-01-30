@@ -9,6 +9,7 @@ using Verse.AI;
 
 namespace TBW
 {
+    //DEPRECATED 
     public abstract class Building_MutliplePawns : Building,IThingHolder, ISuspendableThingHolder
     {
         protected ThingOwner innerContainer;

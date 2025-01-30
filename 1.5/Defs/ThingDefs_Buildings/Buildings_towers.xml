@@ -26,6 +26,11 @@
             <ChunkSlagSteel>1</ChunkSlagSteel>
         </killedLeavings>
         <comps>
+            <li Class="CompProperties_Forbiddable"/>
+            <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
+                <baseMaxPawnNum>4</baseMaxPawnNum>
+                <isSuspended>true</isSuspended>
+            </li>
         </comps>
     </ThingDef>
 
