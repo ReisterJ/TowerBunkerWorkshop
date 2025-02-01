@@ -3,7 +3,7 @@
   <WorkGiverDef>
     <defName>EnterMultiPawnsHolder</defName>
     <label>enter multi pawns building</label>
-    <giverClass>WorkGiver_EnterMultiPawnsHolder</giverClass>
+    <giverClass>TBW.WorkGiver_EnterMultiPawnsHolder</giverClass>
     <verb>enter</verb>
     <gerund>entering</gerund>
     <priorityInType>90</priorityInType>

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Verse;
 using Verse.AI;
 using Verse.Sound;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TBW
 {
@@ -19,13 +18,17 @@ namespace TBW
 
         protected List<Thing> insideThings = new List<Thing>();
 
-        
-        //protected int baseMaxPawnNum;
 
         public int maxPawnNumOffset = 0;
         private int startTick = -1;
 
-        private int currentPawnNum => insidePawns.Count();
+        public int currentPawnNum => insidePawns.Count();
+
+        public override void CompTick()
+        {
+            base.CompTick();
+            innerContainer.ThingOwnerTick();
+        }
         public Comp_TBW_MultiPawnsHolder() 
         {
             innerContainer = new ThingOwner<Thing>(this);
@@ -92,24 +95,37 @@ namespace TBW
             {
                 this
             });
-            Scribe_Values.Look<int>(ref this.startTick, "startTick", -1, false);
-            Scribe_Collections.Look(ref this.insidePawns, "insidePawns", false);
+            //Scribe_Values.Look<int>(ref this.startTick, "startTick", -1, false);
+
+            //Scribe_Collections.Look(ref this.insidePawns, "insidePawns", false);
         }
         public virtual bool CanAcceptPawn(Pawn pawn)
         {
+#if DEBUG
+            string pawns = "pawn";
+            if (currentPawnNum > 1) pawns = "pawns";
+            Log.Message("this building has " + currentPawnNum.ToString() + " " + pawns + ". Max capacity is " + maxPawnNum.ToString());
+#endif
             if(this.currentPawnNum < this.maxPawnNum)
+            {
+                utility.ifDebugLog("Can accept pawn "+ pawn.Name.ToStringFull );
                 return true;
+            }
+            utility.ifDebugLog("Can't accept pawn " + pawn.Name.ToStringFull);
             return false;
         }
+        
+
         public virtual bool TryAcceptPawn(Pawn pawn)
         {
+            if (!CanAcceptPawn(pawn)) return false;
             bool num = pawn.DeSpawnOrDeselect();
 #if DEBUG
             Log.Message(pawn.Name);
 #endif
             if (this.GetDirectlyHeldThings().TryAdd(pawn))
             {
-                this.insidePawns.Add(pawn);
+                //this.insidePawns.Add(pawn);
 #if DEBUG
                 Log.Message("add " + pawn.Name.ToString() + " to " + this.parent.def.defName.ToString());
 #endif

@@ -9,7 +9,7 @@ using Verse.AI;
 namespace TBW
 {
    
-    public class JobDriver_TBW_EnterMultiPawnsHolder: JobDriver
+    public class JobDriver_EnterMultiPawnsHolder: JobDriver
     {
         protected int enterDelay = 60;
         protected Comp_TBW_MultiPawnsHolder multipawnsholder => job.targetA.Thing.TryGetComp<Comp_TBW_MultiPawnsHolder>();
@@ -17,91 +17,36 @@ namespace TBW
         {
             if (!pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed))
             {
+                utility.ifDebugLog("Pre toil reservation failed");
                 return false;
             }
-            List<LocalTargetInfo> targetQueue = job.GetTargetQueue(TargetIndex.B);
-            for (int i = 0; i < targetQueue.Count; i++)
-            {
-                if (!pawn.Reserve(targetQueue[i], job, 1, -1, null, errorOnFailed))
-                {
-                    return false;
-                }
-            }
+            utility.ifDebugLog("Pre toil reservation completed");
             return true;
         }
         protected override IEnumerable<Toil> MakeNewToils()
         {
+            utility.ifDebugLog($"Try entering {multipawnsholder.parent}");
+            utility.ifDebugLog($"Max capacity of {multipawnsholder.parent} is {multipawnsholder.maxPawnNum} ");
+            utility.ifDebugLog($"Current pawn num of {multipawnsholder.parent} is {multipawnsholder.currentPawnNum} ");
+            utility.ifDebugLog($"target A : {TargetA}");
+            //utility.ifDebugLog($"target B : {TargetB}");
             this.FailOnDespawnedOrNull(TargetIndex.A);
-            this.FailOnCannotTouch(TargetIndex.A, PathEndMode.InteractionCell);
+            
             this.FailOn(() => !multipawnsholder.CanAcceptPawn(pawn));
-            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell);
+            utility.ifDebugLog("New toils : GotoThing");
+            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
+
             yield return Toils_General.WaitWith(TargetIndex.A, enterDelay, useProgressBar: true);
-            yield return Toils_General.Do(delegate
+            utility.ifDebugLog($"New toils : WaitWith {enterDelay}");
+            yield return new Toil
             {
-               multipawnsholder.TryAcceptPawn(pawn);
-            });
-        }
-    }
-    public class JobDriver_EnterTower : JobDriver_TBW_EnterMultiPawnsHolder     
-    {
-        public override bool TryMakePreToilReservations(bool errorOnFailed)
-        {
-            if (!pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed))
-            {
-                return false;
-            }
-            List<LocalTargetInfo> targetQueue = job.GetTargetQueue(TargetIndex.B);
-            for (int i = 0; i < targetQueue.Count; i++)
-            {
-                if (!pawn.Reserve(targetQueue[i], job, 1, -1, null, errorOnFailed))
+                initAction = delegate ()
                 {
-                    return false;
+                    utility.ifDebugLog("New toils : Do TryAcceptPawn");
+                    multipawnsholder.TryAcceptPawn(pawn);
                 }
-            }
-            return true;
-        }
-        protected override IEnumerable<Toil> MakeNewToils()
-        {
-            this.FailOnDespawnedOrNull(TargetIndex.A);
-            this.FailOnCannotTouch(TargetIndex.A, PathEndMode.InteractionCell);
-            this.FailOn(() => !multipawnsholder.CanAcceptPawn(pawn));
-            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell);
-            yield return Toils_General.WaitWith(TargetIndex.A, enterDelay, useProgressBar: true);
-            yield return Toils_General.Do(delegate
-            {
-                multipawnsholder.TryAcceptPawn(pawn);
-            });
+            };  
         }
     }
-    public class JobDriver_EnterBunker : JobDriver_TBW_EnterMultiPawnsHolder
-    {
-        public override bool TryMakePreToilReservations(bool errorOnFailed)
-        {
-            if (!pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed))
-            {
-                return false;
-            }
-            List<LocalTargetInfo> targetQueue = job.GetTargetQueue(TargetIndex.B);
-            for (int i = 0; i < targetQueue.Count; i++)
-            {
-                if (!pawn.Reserve(targetQueue[i], job, 1, -1, null, errorOnFailed))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        protected override IEnumerable<Toil> MakeNewToils()
-        {
-            this.FailOnDespawnedOrNull(TargetIndex.A);
-            this.FailOnCannotTouch(TargetIndex.A, PathEndMode.InteractionCell);
-            this.FailOn(() => !multipawnsholder.CanAcceptPawn(pawn));
-            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell);
-            yield return Toils_General.WaitWith(TargetIndex.A, enterDelay, useProgressBar: true);
-            yield return Toils_General.Do(delegate
-            {
-                multipawnsholder.TryAcceptPawn(pawn);
-            });
-        }
-    }
+    
 }

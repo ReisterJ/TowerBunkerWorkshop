@@ -2,7 +2,7 @@
 <Defs>
     <JobDef>
         <defName>EnterMultiPawnsHolder</defName>
-        <driverClass>TBW.JobDriver_TBW_EnterMultiPawnsHolder</driverClass>
+        <driverClass>TBW.JobDriver_EnterMultiPawnsHolder</driverClass>
         <reportString>Enter building.</reportString>
         <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
     </JobDef>
