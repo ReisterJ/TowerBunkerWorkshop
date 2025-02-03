@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 using Verse.Sound;
@@ -85,9 +86,26 @@ namespace TBW
             {
                 destMap = parent.Map;
             }
- 
+            utility.ifDebugLog($"Pawn num of {this.parent.def.defName.ToString()} is {this.currentPawnNum}.Ejecting all pawns.");
             innerContainer.TryDropAll(parent.InteractionCell, destMap, ThingPlaceMode.Near);
+            this.insidePawns.Clear();
         }
+
+        public override void PostDestroy(DestroyMode mode, Map previousMap)
+        {
+            if (mode == DestroyMode.Deconstruct || mode == DestroyMode.KillFinalize)
+            {
+                utility.ifDebugLog($"{this.parent.def.defName.ToString()} was destroyed.");
+                EjectContents(previousMap);
+            }
+            innerContainer.ClearAndDestroyContents();
+            base.PostDestroy(mode, previousMap);
+        }
+        public override void PostDeSpawn(Map map)
+        {
+            EjectContents(map);
+        }
+
         public override void PostExposeData()
         {
             base.PostExposeData();
@@ -97,7 +115,7 @@ namespace TBW
             });
             //Scribe_Values.Look<int>(ref this.startTick, "startTick", -1, false);
 
-            //Scribe_Collections.Look(ref this.insidePawns, "insidePawns", false);
+            Scribe_Collections.Look(ref this.insidePawns, "insidePawns", false, LookMode.Reference);
         }
         public virtual bool CanAcceptPawn(Pawn pawn)
         {
@@ -114,7 +132,30 @@ namespace TBW
             utility.ifDebugLog("Can't accept pawn " + pawn.Name.ToStringFull);
             return false;
         }
-        
+
+        public override IEnumerable<Gizmo> CompGetGizmosExtra()
+        {
+            if (base.parent.Faction == Faction.OfPlayer && innerContainer.Count() > 0 )
+            {
+                Command_Action command_Action = new Command_Action();
+                command_Action.action = delegate
+                {
+                    EjectContents();
+
+                };    
+                command_Action.defaultLabel = "CommandEject";
+                command_Action.defaultDesc = "CommandEjectDesc";
+                if (innerContainer.Count == 0)
+                {
+                    command_Action.Disable("CommandEjectFailEmpty");
+                }
+                command_Action.icon = ContentFinder<Texture2D>.Get("UI/Commands/PodEject");
+                yield return command_Action;
+            }   
+            if (DebugSettings.ShowDevGizmos) {  
+                yield break; 
+            }
+        }
 
         public virtual bool TryAcceptPawn(Pawn pawn)
         {
@@ -125,7 +166,7 @@ namespace TBW
 #endif
             if (this.GetDirectlyHeldThings().TryAdd(pawn))
             {
-                //this.insidePawns.Add(pawn);
+                this.insidePawns.Add(pawn);
 #if DEBUG
                 Log.Message("add " + pawn.Name.ToString() + " to " + this.parent.def.defName.ToString());
 #endif

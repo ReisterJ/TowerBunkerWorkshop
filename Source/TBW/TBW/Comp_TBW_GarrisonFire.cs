@@ -9,7 +9,7 @@ using Verse.AI;
 
 namespace TBW
 {
-    public class Comp_TBW_GarrisonWeapon : ThingComp,IAttackTargetSearcher
+    public class Comp_TBW_GarrisonFire : ThingComp,IAttackTargetSearcher
     {
         protected LocalTargetInfo forcedTarget = LocalTargetInfo.Invalid;
 
@@ -17,19 +17,26 @@ namespace TBW
 
         public Thing Weapon;
 
+        protected List<Pawn> pawnsGarrisoned = new List<Pawn>();
+
         protected int burstCooldownTicksLeft;
 
         protected int burstWarmupTicksLeft;
 
         protected LocalTargetInfo currentTarget = LocalTargetInfo.Invalid;
 
-        private bool fireAtWill = true;
+        protected bool fireAtWill = true;
         
         private LocalTargetInfo lastAttackedTarget = LocalTargetInfo.Invalid;
 
         private int lastAttackTargetTick;
 
-        private bool isGarrisoned = false;
+        public bool isGarrisoned 
+        {
+            get {
+                return pawnsGarrisoned.Count() > 0;
+            }  
+        }
 
         public Thing Thing
         {
@@ -50,7 +57,7 @@ namespace TBW
             this.lastAttackTargetTick = Find.TickManager.TicksGame;
             this.lastAttackedTarget = target;
         }
-        public Verb CurrentEffectiveVerb
+        public virtual Verb CurrentEffectiveVerb
         {
             get
             {
@@ -78,7 +85,7 @@ namespace TBW
                 return this.Weapon.TryGetComp<CompEquippable>();
             }
         }
-        public Verb AttackVerb
+        public virtual Verb AttackVerb
         {
             get
             {
@@ -171,7 +178,7 @@ namespace TBW
             this.Weapon = ThingMaker.MakeThing(this.Props.MainWeaponDef, null);
             this.UpdateWeaponVerbs();
         }
-        protected virtual void UpdateWeaponVerbs()
+        public virtual void UpdateWeaponVerbs()
         {
             List<Verb> allVerbs = this.Weapon.TryGetComp<CompEquippable>().AllVerbs;
             for (int i = 0; i < allVerbs.Count; i++)
@@ -184,8 +191,8 @@ namespace TBW
                 };
             }
         }
-
-        private void ResetCurrentTarget()
+         
+        public virtual void ResetCurrentTarget()
         {
             this.currentTarget = LocalTargetInfo.Invalid;
             this.burstWarmupTicksLeft = 0;
@@ -202,7 +209,7 @@ namespace TBW
     public class CompProperties_TBW_GarrisonWeapon : CompProperties
     {
         public CompProperties_TBW_GarrisonWeapon(){
-            this.compClass = typeof(Comp_TBW_GarrisonWeapon);
+            this.compClass = typeof(Comp_TBW_GarrisonFire);
         }
 
         public ThingDef MainWeaponDef;
