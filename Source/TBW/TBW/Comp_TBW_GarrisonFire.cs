@@ -13,7 +13,9 @@ namespace TBW
     {
         protected LocalTargetInfo forcedTarget = LocalTargetInfo.Invalid;
 
-        private const float SightRadiusTurret = 30.1f;
+        private static readonly CachedTexture ToggleTurretIcon = new CachedTexture("UI/Gizmos/ToggleTurret");
+
+        protected float SightRadiusTurret = 30.1f;
 
         public Thing Weapon;
 
@@ -30,6 +32,18 @@ namespace TBW
         private LocalTargetInfo lastAttackedTarget = LocalTargetInfo.Invalid;
 
         private int lastAttackTargetTick;
+
+        private Comp_TBW_MultiPawnsHolder CachedComp_MultiPawnsHolder = null;
+
+        private int CachedTempGarrisonTroopNum = 0;
+
+        protected void Get_Parent_MultiPawnsHolderComp() 
+        {
+            Comp_TBW_MultiPawnsHolder mph = this.parent.TryGetComp<Comp_TBW_MultiPawnsHolder>();
+            if (mph != null) {
+                CachedComp_MultiPawnsHolder = mph;
+            }
+        }
 
         public bool isGarrisoned 
         {
@@ -134,7 +148,23 @@ namespace TBW
             {
                 return;
             }
+            if (CachedComp_MultiPawnsHolder == null) 
+            {
+                utility.ifDebugLog($"{this.parent.def.defName.ToString() }'s CachedComp_MultiPawnsHolder is null");
+                this.Get_Parent_MultiPawnsHolderComp();
+                if (CachedComp_MultiPawnsHolder != null) {
+                    utility.ifDebugLog($"{this.parent.def.defName.ToString()}'s CachedComp_MultiPawnsHolder cached");
+                    CachedTempGarrisonTroopNum = CachedComp_MultiPawnsHolder.currentPawnNum;
+                }
+            }
+            else
+            {
+                CachedTempGarrisonTroopNum = CachedComp_MultiPawnsHolder.currentPawnNum;
+                utility.ifDebugLog("CachedTempGarrisonTroopNum is " + CachedTempGarrisonTroopNum.ToString());
+            }
+            
             this.AttackVerb.VerbTick();
+            //utility.ifDebugLog($"Garrison Weapon Verb ");
             if (this.AttackVerb.state != VerbState.Bursting)
             {
                 if (this.WarmingUp)
@@ -152,7 +182,9 @@ namespace TBW
                 {
                     if (this.burstCooldownTicksLeft > 0)
                     {
-                        this.burstCooldownTicksLeft--;
+                        this.burstCooldownTicksLeft = (CachedTempGarrisonTroopNum > 0 ? 
+                            this.burstCooldownTicksLeft - this.Props.CDTicksReducePerPawn * CachedTempGarrisonTroopNum : 
+                            this.burstCooldownTicksLeft - 1);
                     }
                     if (this.burstCooldownTicksLeft <= 0 && this.parent.IsHashIntervalTick(10))
                     {
@@ -204,6 +236,27 @@ namespace TBW
             Scribe_Values.Look<int>(ref this.burstWarmupTicksLeft, "burstWarmupTicksLeft", 0, false);
             Scribe_TargetInfo.Look(ref this.currentTarget, "currentTarget");
         }
+
+        public override IEnumerable<Gizmo> CompGetGizmosExtra()
+        {
+            foreach (Gizmo item in base.CompGetGizmosExtra())
+            {
+                yield return item;
+            }
+            if (this.Weapon != null)
+            {
+                Command_Toggle command_Toggle = new Command_Toggle();
+                command_Toggle.defaultLabel = "CommandToggleTurret".Translate();
+                command_Toggle.defaultDesc = "CommandToggleTurretDesc".Translate();
+                command_Toggle.isActive = () => fireAtWill;
+                command_Toggle.icon = ToggleTurretIcon.Texture;
+                command_Toggle.toggleAction = delegate
+                {
+                    fireAtWill = !fireAtWill;
+                };
+                yield return command_Toggle;
+            }
+        }
     }
 
     public class CompProperties_TBW_GarrisonWeapon : CompProperties
@@ -214,6 +267,8 @@ namespace TBW
 
         public ThingDef MainWeaponDef;
         public bool AutoAttack = true;
+        public int CDTicksReducePerPawn = 1;
+
 
         public List<PawnRenderNodeProperties> renderNodeProperties;
         public List<ThingDef> Weapons;

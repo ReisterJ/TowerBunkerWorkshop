@@ -64,4 +64,84 @@
         </li>
         </verbs>
     </ThingDef>
+    <ThingDef ParentName="TBW_TowerBase">
+        <!-- <thingClass>Building_Tower</thingClass> -->
+        <defName>TBW_WatchTower_Industrial</defName>
+        <label>watchtower</label>
+        <description>A tower which can be garrisoned.It provides cover for people inside to shoot enemies safely</description>
+        <graphicData>
+            <texPath>Things/Buildings/Towers/tower</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(2,2)</drawSize>
+            <drawOffset>(0,0,-0.16)</drawOffset>
+            <damageData>
+                <rect>(0.3,0.3,1.4,1.4)</rect>
+            </damageData>
+            <shadowData>
+                <volume>(1.5,0.35,1.4)</volume>
+                <offset>(0,0,-0.05)</offset>
+            </shadowData>
+        </graphicData>
+        <costList>
+            <Steel>300</Steel>
+        </costList>
+        <tickerType>Normal</tickerType>
+        <killedLeavings>
+            <ChunkSlagSteel>2</ChunkSlagSteel>
+        </killedLeavings>
+        <comps>
+            <li Class="CompProperties_Forbiddable"/>
+            <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
+                <baseMaxPawnNum>5</baseMaxPawnNum>
+                <isSuspended>true</isSuspended>
+            </li>
+        </comps>
+    </ThingDef>
+
+    <ThingDef ParentName="BaseWeaponTurret">
+        <defName>TBW_MG</defName>
+        <label>Bow</label>
+        <description>Mg defense.</description>
+        <graphicData>
+            <texPath>Things/Item/Equipment/WeaponRanged/BowGreat</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <tradeability>None</tradeability>
+        <destroyOnDrop>true</destroyOnDrop>
+        <statBases>
+        <Mass>20.0</Mass>
+        <AccuracyTouch>0.98</AccuracyTouch>
+        <AccuracyShort>0.90</AccuracyShort>
+        <AccuracyMedium>0.82</AccuracyMedium>
+        <AccuracyLong>0.75</AccuracyLong>
+        </statBases>
+        <verbs>
+        <li>
+            <verbClass>Verb_Shoot</verbClass>
+            <defaultProjectile>TBW_MG_Bullet</defaultProjectile>
+            <range>36.9</range>
+            <soundCast>Shot_ChargeBlaster</soundCast>
+            <soundCastTail>GunTail_Heavy</soundCastTail>
+            <muzzleFlashScale>9</muzzleFlashScale>
+            <defaultCooldownTime>2.0</defaultCooldownTime>
+            <burstShotCount>4</burstShotCount>
+            <ticksBetweenBurstShots>10</ticksBetweenBurstShots>
+        </li>
+        </verbs>
+    </ThingDef>
+    <ThingDef  ParentName="BaseBullet">
+        <defName>TBW_MG_Bullet</defName>
+        <label>MG_Bullet</label>
+        <graphicData>
+            <texPath>Things/Projectile/Bullet_Big</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <projectile>
+            <damageDef>Bullet</damageDef>
+            <damageAmountBase>25</damageAmountBase>
+            <speed>90</speed>
+            <stoppingPower>3</stoppingPower>
+            <armorPenetrationBase>0.40</armorPenetrationBase>
+        </projectile>
+    </ThingDef>
 </Defs>

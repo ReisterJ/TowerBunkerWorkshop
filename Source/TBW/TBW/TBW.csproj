@@ -61,8 +61,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Building_MutliplePawns.cs" />
-    <Compile Include="Building_Tower.cs" />
+    <Compile Include="Building_Upgradable.cs" />
+    <Compile Include="Comp_TBW_Production.cs" />
     <Compile Include="JobDriver_EnterMultiPawnsHolder.cs" />
     <Compile Include="Comp_TBW_MultiPawnsHolder.cs" />
     <Compile Include="Comp_TBW_GarrisonFire.cs" />

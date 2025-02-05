@@ -19,6 +19,7 @@ namespace TBW
 
         protected List<Thing> insideThings = new List<Thing>();
 
+        
 
         public int maxPawnNumOffset = 0;
         private int startTick = -1;
@@ -29,6 +30,7 @@ namespace TBW
         {
             base.CompTick();
             innerContainer.ThingOwnerTick();
+           
         }
         public Comp_TBW_MultiPawnsHolder() 
         {
