@@ -37,6 +37,16 @@ namespace TBW
 
         private int CachedTempGarrisonTroopNum = 0;
 
+        protected int CurrentAmmo = 0;
+
+        protected int MaxAmmo = 0;
+
+
+
+        public virtual void LoadAmmo(int ammo)
+        {
+            this.CurrentAmmo = ( (this.CurrentAmmo + ammo) > MaxAmmo ? MaxAmmo : this.CurrentAmmo += ammo );
+        }
         protected void Get_Parent_MultiPawnsHolderComp() 
         {
             Comp_TBW_MultiPawnsHolder mph = this.parent.TryGetComp<Comp_TBW_MultiPawnsHolder>();
@@ -133,14 +143,23 @@ namespace TBW
                 return compCanBeDormant == null || compCanBeDormant.Awake;
             }
         }
-        public bool AutoAttack
+
+        
+
+        public bool autoAttack
         {
             get
             {
-                return this.Props.AutoAttack;
+                return this.Props.autoAttack;
             }
         }
 
+        public virtual void GarrisonFireCoolDownTick()
+        {
+            this.burstCooldownTicksLeft = (CachedTempGarrisonTroopNum > 0 ?
+                            this.burstCooldownTicksLeft - this.Props.CDTicksReducePerPawn * CachedTempGarrisonTroopNum :
+                            this.burstCooldownTicksLeft - 1);
+        }
         public override void CompTick()
         {
             base.CompTick();
@@ -160,7 +179,7 @@ namespace TBW
             else
             {
                 CachedTempGarrisonTroopNum = CachedComp_MultiPawnsHolder.currentPawnNum;
-                utility.ifDebugLog("CachedTempGarrisonTroopNum is " + CachedTempGarrisonTroopNum.ToString());
+                //utility.ifDebugLog("CachedTempGarrisonTroopNum is " + CachedTempGarrisonTroopNum.ToString());
             }
             
             this.AttackVerb.VerbTick();
@@ -182,9 +201,7 @@ namespace TBW
                 {
                     if (this.burstCooldownTicksLeft > 0)
                     {
-                        this.burstCooldownTicksLeft = (CachedTempGarrisonTroopNum > 0 ? 
-                            this.burstCooldownTicksLeft - this.Props.CDTicksReducePerPawn * CachedTempGarrisonTroopNum : 
-                            this.burstCooldownTicksLeft - 1);
+                        GarrisonFireCoolDownTick();
                     }
                     if (this.burstCooldownTicksLeft <= 0 && this.parent.IsHashIntervalTick(10))
                     {
@@ -207,7 +224,7 @@ namespace TBW
         }
         public virtual void MakeWeapon()
         {
-            this.Weapon = ThingMaker.MakeThing(this.Props.MainWeaponDef, null);
+            this.Weapon = ThingMaker.MakeThing(this.Props.mainWeaponDef, null);
             this.UpdateWeaponVerbs();
         }
         public virtual void UpdateWeaponVerbs()
@@ -257,6 +274,12 @@ namespace TBW
                 yield return command_Toggle;
             }
         }
+        public string GetUniqueLoadID()
+        {
+            return this.parent.GetUniqueLoadID();
+        }
+
+
     }
 
     public class CompProperties_TBW_GarrisonWeapon : CompProperties
@@ -265,8 +288,8 @@ namespace TBW
             this.compClass = typeof(Comp_TBW_GarrisonFire);
         }
 
-        public ThingDef MainWeaponDef;
-        public bool AutoAttack = true;
+        public ThingDef mainWeaponDef;
+        public bool autoAttack = true;
         public int CDTicksReducePerPawn = 1;
 
 

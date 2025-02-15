@@ -36,10 +36,12 @@
     <costStuffCount>200</costStuffCount>
     <designationCategory>Security</designationCategory>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+    <placeWorkers>
+      <li>PlaceWorker_NotUnderRoof</li>
+    </placeWorkers>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
   </ThingDef>
   <ThingDef Abstract="True" Name="TBW_BunkerBase" ParentName="BuildingBase">
-    <!-- <thingClass>Building_Tower</thingClass> -->
     <drawerType>MapMeshAndRealTime</drawerType>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Impassable</passability>
@@ -74,7 +76,6 @@
     <constructionSkillPrerequisite>10</constructionSkillPrerequisite>
   </ThingDef>
   <ThingDef Abstract="True" Name="TBW_WorkShopBase" ParentName="BuildingBase">
-    <!-- <thingClass>Building_Tower</thingClass> -->
     <drawerType>MapMeshAndRealTime</drawerType>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Impassable</passability>
@@ -87,6 +88,9 @@
     <building>
       
     </building>
+    <placeWorkers>
+      <li>PlaceWorker_NotUnderRoof</li>
+    </placeWorkers>
     <!-- <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded> -->
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
   </ThingDef>
