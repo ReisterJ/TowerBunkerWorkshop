@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -252,6 +253,20 @@ namespace TBW
             Scribe_Values.Look<int>(ref this.burstCooldownTicksLeft, "burstCooldownTicksLeft", 0, false);
             Scribe_Values.Look<int>(ref this.burstWarmupTicksLeft, "burstWarmupTicksLeft", 0, false);
             Scribe_TargetInfo.Look(ref this.currentTarget, "currentTarget");
+            Scribe_Deep.Look(ref this.Weapon, "Weapon");
+            Scribe_Values.Look(ref fireAtWill, "fireAtWill", defaultValue: true);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                if (Weapon == null)
+                {
+                    Log.Error("null weapon after loading. Recreating.");
+                    MakeWeapon();
+                }
+                else
+                {
+                    UpdateWeaponVerbs();
+                }
+            }
         }
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()

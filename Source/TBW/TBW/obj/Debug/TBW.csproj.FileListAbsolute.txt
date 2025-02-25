@@ -6,3 +6,9 @@ E:\workstation\rimworld\TowerBunkerWorkshop\Source\TBW\TBW\obj\Debug\TBW.dll
 E:\workstation\rimworld\TowerBunkerWorkshop\Source\TBW\TBW\obj\Debug\TBW.pdb
 E:\workstation\rimworld\TowerBunkerWorkshop\1.5\Assemblies\TBW.dll
 E:\workstation\rimworld\TowerBunkerWorkshop\1.5\Assemblies\TBW.pdb
+E:\workstation\rimworld\dev\Tower Bunker Workshop\1.5\Assemblies\TBW.dll
+E:\workstation\rimworld\dev\Tower Bunker Workshop\1.5\Assemblies\TBW.pdb
+E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.csproj.AssemblyReference.cache
+E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.csproj.CoreCompileInputs.cache
+E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.dll
+E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.pdb

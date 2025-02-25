@@ -145,7 +145,7 @@
             <soundCastTail>GunTail_Heavy</soundCastTail>
             <muzzleFlashScale>9</muzzleFlashScale>
             <defaultCooldownTime>3.0</defaultCooldownTime>
-            <burstShotCount>2</burstShotCount>
+            <burstShotCount>3</burstShotCount>
             <ticksBetweenBurstShots>10</ticksBetweenBurstShots>
         </li>
         </verbs>
@@ -159,7 +159,7 @@
         </graphicData>
         <projectile>
             <damageDef>Bullet</damageDef>
-            <damageAmountBase>22</damageAmountBase>
+            <damageAmountBase>20</damageAmountBase>
             <speed>90</speed>
             <stoppingPower>3</stoppingPower>
             <armorPenetrationBase>0.40</armorPenetrationBase>
