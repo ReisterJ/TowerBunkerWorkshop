@@ -9,22 +9,32 @@ using Verse.AI;
 
 namespace TBW
 {
+
     public static class utility
     {
         public static void ifDebugLog(string text)
         {
+            return;
+
 #if DEBUG
-            Log.Message(text);
+            //Log.Message(text);
 #endif
         }
 
         public static void ifDebugLog(object obj)
         {
+            return;
+#if DEBUG
+            //Log.Message(obj);
+#endif
+        }
+        public static void ifDebugLog(object obj, bool output)
+        {
+            if (!output) return;
 #if DEBUG
             Log.Message(obj);
 #endif
         }
 
-        
     }
 }

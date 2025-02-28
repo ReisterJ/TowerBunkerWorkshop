@@ -19,10 +19,10 @@ namespace TBW
 
         protected List<Thing> insideThings = new List<Thing>();
 
-        
+        public List<Pair<Pawn,int>> pawnHolderTickRecord = new List<Pair<Pawn,int>>();
 
         public int maxPawnNumOffset = 0;
-        private int startTick = -1;
+        //private int startTick = -1;
 
         public int currentPawnNum => insidePawns.Count();
 
@@ -30,7 +30,13 @@ namespace TBW
         {
             base.CompTick();
             innerContainer.ThingOwnerTick();
-           
+            if (IsContentsSuspended)
+            {
+                foreach (Pawn pawn in insidePawns)
+                {
+                    pawn.ageTracker.AgeTick();
+                }
+            }
         }
         public Comp_TBW_MultiPawnsHolder() 
         {
@@ -89,7 +95,8 @@ namespace TBW
                 destMap = parent.Map;
             }
             utility.ifDebugLog($"Pawn num of {this.parent.def.defName.ToString()} is {this.currentPawnNum}.Ejecting all pawns.");
-            innerContainer.TryDropAll(parent.InteractionCell, destMap, ThingPlaceMode.Near);
+            IntVec3 dropPoint = parent.InteractionCell != null ? parent.InteractionCell : parent.Position;
+            innerContainer.TryDropAll(dropPoint, destMap, ThingPlaceMode.Near);
             this.insidePawns.Clear();
         }
 
@@ -172,7 +179,8 @@ namespace TBW
 #if DEBUG
                 Log.Message("add " + pawn.Name.ToString() + " to " + this.parent.def.defName.ToString());
 #endif
-
+                Pair<Pawn,int> tempRecord = new Pair<Pawn, int>(pawn,Find.TickManager.TicksThisFrame);
+                
                 if (num)
                 {
                     Find.Selector.Select(pawn, playSound: false, forceDesignatorDeselect: false);

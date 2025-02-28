@@ -75,7 +75,7 @@
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
     <constructionSkillPrerequisite>10</constructionSkillPrerequisite>
   </ThingDef>
-  <ThingDef Abstract="True" Name="TBW_WorkShopBase" ParentName="BuildingBase">
+  <ThingDef Abstract="True" Name="TBW_ProductionBase" ParentName="BuildingBase">
     <drawerType>MapMeshAndRealTime</drawerType>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Impassable</passability>
@@ -94,4 +94,6 @@
     <!-- <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded> -->
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
   </ThingDef>
+
+  
 </Defs>

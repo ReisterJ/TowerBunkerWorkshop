@@ -25,19 +25,19 @@ namespace TBW
         }
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            utility.ifDebugLog($"Try entering {multipawnsholder.parent}");
-            utility.ifDebugLog($"Max capacity of {multipawnsholder.parent} is {multipawnsholder.maxPawnNum} ");
-            utility.ifDebugLog($"Current pawn num of {multipawnsholder.parent} is {multipawnsholder.currentPawnNum} ");
-            utility.ifDebugLog($"target A : {TargetA}");
+            //utility.ifDebugLog($"Try entering {multipawnsholder.parent}");
+            //utility.ifDebugLog($"Max capacity of {multipawnsholder.parent} is {multipawnsholder.maxPawnNum} ");
+            //utility.ifDebugLog($"Current pawn num of {multipawnsholder.parent} is {multipawnsholder.currentPawnNum} ");
+            //utility.ifDebugLog($"target A : {TargetA}");
             //utility.ifDebugLog($"target B : {TargetB}");
             this.FailOnDespawnedOrNull(TargetIndex.A);
             
             this.FailOn(() => !multipawnsholder.CanAcceptPawn(pawn));
-            utility.ifDebugLog("New toils : GotoThing");
+            //utility.ifDebugLog("New toils : GotoThing");
             yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
 
             yield return Toils_General.WaitWith(TargetIndex.A, enterDelay, useProgressBar: true);
-            utility.ifDebugLog($"New toils : WaitWith {enterDelay}");
+            //utility.ifDebugLog($"New toils : WaitWith {enterDelay}");
             yield return new Toil
             {
                 initAction = delegate ()

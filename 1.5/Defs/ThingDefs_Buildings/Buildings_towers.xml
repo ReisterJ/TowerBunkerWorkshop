@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
     <ThingDef ParentName="TBW_TowerBase">
-        <!-- <thingClass>Building_Tower</thingClass> -->
         <defName>TBW_WatchTower_Medieval</defName>
         <label>Medieval watchtower</label>
         <description>A tower which can be garrisoned.It provides cover for people inside to shoot enemies safely</description>
         <graphicData>
-            <texPath>Things/Buildings/Towers/tower_m</texPath>
+            <texPath>Things/Building/Linked/Barricade_Atlas</texPath>
             <graphicClass>Graphic_Single</graphicClass>
             <drawSize>(2,2)</drawSize>
             <drawOffset>(0,0,-0.16)</drawOffset>
@@ -73,10 +72,10 @@
     <ThingDef ParentName="TBW_TowerBase">
         <!-- <thingClass>Building_Tower</thingClass> -->
         <defName>TBW_WatchTower_Industrial</defName>
-        <label>watchtower</label>
+        <label>Guard tower</label>
         <description>A tower which can be garrisoned.It provides cover for people inside to shoot enemies safely</description>
         <graphicData>
-            <texPath>Things/Buildings/Towers/tower</texPath>
+            <texPath>Things/Building/Linked/Barricade_Atlas</texPath>
             <graphicClass>Graphic_Single</graphicClass>
             <drawSize>(2,2)</drawSize>
             <drawOffset>(0,0,-0.16)</drawOffset>
@@ -166,4 +165,159 @@
             <!-- <flyOverhead>true</flyOverhead> -->
         </projectile>
     </ThingDef>
+
+    <ThingDef ParentName="TBW_TowerBase">
+        <defName>TBW_WatchTower_Spacer</defName>
+        <label>Tower</label>
+        <description>A tower which can be garrisoned.It provides cover for people inside to shoot enemies safely</description>
+        <graphicData>
+            <texPath>Things/Building/Linked/Barricade_Atlas</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(2,2)</drawSize>
+            <drawOffset>(0,0,-0.16)</drawOffset>
+            <damageData>
+                <rect>(0.3,0.3,1.4,1.4)</rect>
+            </damageData>
+            <shadowData>
+                <volume>(1.5,0.35,1.4)</volume>
+                <offset>(0,0,-0.05)</offset>
+            </shadowData>
+        </graphicData>
+        <thingClass>TBW.Building_TBW_Security</thingClass>
+        
+        <stuffCategories Inherit="false">
+            
+        </stuffCategories>
+        <damageMultipliers>
+            <li>
+                <damageDef>Bullet</damageDef>
+                <multiplier>0.5</multiplier>
+            </li>
+            <li>
+                <damageDef>Cut</damageDef>
+                <multiplier>0.2</multiplier>
+            </li>
+            <li>
+                <damageDef>Stab</damageDef>
+                <multiplier>0.2</multiplier>
+            </li>
+        </damageMultipliers>
+        <statBases>
+            <MaxHitPoints>1000</MaxHitPoints>
+            <Flammability>0</Flammability>
+            <Mass>100</Mass>
+            <Beauty>-5</Beauty>
+            <WorkToBuild>6000</WorkToBuild>
+            <MarketValue>2000</MarketValue>
+        </statBases>
+        <costList>
+            <Plasteel>300</Plasteel>
+            <Uranium>100</Uranium>
+            <Steel>300</Steel>
+            <ComponentSpacer>10</ComponentSpacer>
+        </costList>
+        <tickerType>Normal</tickerType>
+        <killedLeavings>
+            <ChunkSlagSteel>1</ChunkSlagSteel>
+        </killedLeavings>
+        <comps>
+            <li Class="CompProperties_Forbiddable"/>
+            <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
+                <baseMaxPawnNum>6</baseMaxPawnNum>
+                <isSuspended>true</isSuspended>
+            </li>
+            <li Class="TBW.CompProperties_TBW_GarrisonWeapon">
+                <mainWeaponDef>TBW_ChargeDefender</mainWeaponDef>
+                <autoAttack>true</autoAttack>
+                <CDTicksReducePerPawn>1</CDTicksReducePerPawn>
+            </li>
+        </comps>
+    </ThingDef>
+
+    <ThingDef ParentName="BaseWeaponTurret">
+        <defName>TBW_ChargeDefender</defName>
+        <label>ChargeDefender</label>
+        <description>High-tech defensive measure.</description>
+        <graphicData>
+            <texPath>Things/Item/Equipment/WeaponRanged/BowGreat</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <tradeability>None</tradeability>
+        <destroyOnDrop>true</destroyOnDrop>
+        <statBases>
+        <Mass>2.6</Mass>
+        <AccuracyTouch>0.95</AccuracyTouch>
+        <AccuracyShort>0.90</AccuracyShort>
+        <AccuracyMedium>0.80</AccuracyMedium>
+        <AccuracyLong>0.6</AccuracyLong>
+        </statBases>
+        <verbs>
+        <li>
+            <verbClass>Verb_Shoot</verbClass>
+            <defaultProjectile>TBW_Charge_Shot</defaultProjectile>
+            <range>46.9</range>
+            <soundCast>Shot_ChargeBlaster</soundCast>
+            <soundCastTail>GunTail_Heavy</soundCastTail>
+            <muzzleFlashScale>9</muzzleFlashScale>
+            <defaultCooldownTime>2.0</defaultCooldownTime>
+            <ticksBetweenBurstShots>30</ticksBetweenBurstShots>
+        </li>
+        </verbs>
+    </ThingDef>
+
+    <ThingDef  ParentName="BaseBullet">
+        <defName>TBW_Charge_Shot</defName>
+        <label>Charged shot</label>
+        <graphicData>
+            <texPath>Things/Projectile/Bullet_Big</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+        </graphicData>
+        <projectile>
+            <damageDef>Bullet</damageDef>
+            <damageAmountBase>20</damageAmountBase>
+            <speed>90</speed>
+            <stoppingPower>3</stoppingPower>
+            <armorPenetrationBase>0.40</armorPenetrationBase>
+            <!-- <flyOverhead>true</flyOverhead> -->
+        </projectile>
+    </ThingDef>
+
+    <!-- <ThingDef ParentName="TBW_TowerBase">
+        <defName>TBW_TeslaTower</defName>
+        <label>Tesla tower</label>
+        <description>A tower which can release arc chains damaging multiple targets.Pawns inside tower give a Weapon cooldown bonus.</description>
+        <graphicData>
+            <texPath>Things/Building/Linked/Barricade_Atlas</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(2,2)</drawSize>
+            <drawOffset>(0,0,-0.16)</drawOffset>
+            <damageData>
+                <rect>(0.3,0.3,1.4,1.4)</rect>
+            </damageData>
+            <shadowData>
+                <volume>(1.5,0.35,1.4)</volume>
+                <offset>(0,0,-0.05)</offset>
+            </shadowData>
+        </graphicData>
+        <thingClass>TBW.Building_TBW_Security</thingClass>
+        <costList>
+            <Steel>50</Steel>
+        </costList>
+        <tickerType>Normal</tickerType>
+        <killedLeavings>
+            <ChunkSlagSteel>1</ChunkSlagSteel>
+        </killedLeavings>
+        <comps>
+            <li Class="CompProperties_Forbiddable"/>
+            <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
+                <baseMaxPawnNum>4</baseMaxPawnNum>
+                <isSuspended>true</isSuspended>
+            </li>
+            <li Class="TBW.CompProperties_TBW_GarrisonWeapon">
+                <mainWeaponDef>TBW_Bow</mainWeaponDef>
+                <autoAttack>true</autoAttack>
+                <CDTicksReducePerPawn>1</CDTicksReducePerPawn>
+            </li>
+        </comps>
+    </ThingDef> -->
 </Defs>

@@ -13,6 +13,22 @@ namespace TBW
     {
         protected int ticksUntilSpawn;
         protected bool PowerOn => parent.GetComp<CompPowerTrader>()?.PowerOn ?? false;
+
+        protected Comp_TBW_MultiPawnsHolder cachedMultiPawnsHolder;
+
+        protected ThingDef thingToSpawn;
+
+        protected int tickstoSpawn;
+
+        protected int output;
+
+        protected int outputAddPerPawn;
+
+        protected float outputMultiplier;
+
+        protected int spawnCount;
+
+        public List<TBW_Production_Set> spawnListDefault = new List<TBW_Production_Set>();
         public CompProperties_TBW_Production Props 
         { 
             get
@@ -26,12 +42,33 @@ namespace TBW
             TickInterval(1);
         }
 
-        public override void CompTickRare()
+        public override void PostSpawnSetup(bool respawningAfterLoad)
         {
-            TickInterval(250);
-        }
+            base.PostSpawnSetup(respawningAfterLoad);
+            
+            cachedMultiPawnsHolder = parent.TryGetComp<Comp_TBW_MultiPawnsHolder>();
 
-        protected void TickInterval(int interval)
+            if(thingToSpawn == null)
+            {
+                thingToSpawn = Props.spawnList.FirstOrDefault().spawnDef;
+            }
+            if (spawnListDefault.Count() == 0)
+            {
+                foreach (TBW_Production_Set tps in Props.spawnList)
+                {
+                    this.spawnListDefault.Add(tps);
+                }
+            }
+            
+        }
+        /*
+        public override void comptickrare()
+        {
+            tickinterval(250);
+        }
+        */
+
+        protected virtual void TickInterval(int interval)
         {
             if (!parent.Spawned)
             {
@@ -51,13 +88,25 @@ namespace TBW
             }
             if (!Props.requiresPower || PowerOn)
             {
-                ticksUntilSpawn -= interval;
+                SpawnTick(interval);
                 CheckShouldSpawn();
             }
         }
+
+        public virtual void SpawnTick(int interval)
+        {
+            int tickReduction = interval;
+            int pawnNum = cachedMultiPawnsHolder.currentPawnNum;
+            if (pawnNum >= 5)
+            {
+                tickReduction = interval * 2;
+            }
+            ticksUntilSpawn -= tickReduction;
+            
+        }
         public void ResetCountdown()
         {
-            ticksUntilSpawn = Props.spawnIntervalRange.RandomInRange;
+            ticksUntilSpawn = Props.tickstoSpawnDefault;
         }
         protected virtual void CheckShouldSpawn()
         {
@@ -86,7 +135,7 @@ namespace TBW
                     List<Thing> thingList = c.GetThingList(parent.Map);
                     for (int j = 0; j < thingList.Count; j++)
                     {
-                        if (thingList[j].def == Props.thingToSpawn)
+                        if (thingList[j].def == thingToSpawn)
                         {
                             num += thingList[j].stackCount;
                             if (num >= Props.spawnMaxAdjacent)
@@ -97,30 +146,39 @@ namespace TBW
                     }
                 }
             }
-            if (TryFindSpawnCell(parent, Props.thingToSpawn, Props.spawnCount, out var result))
+            foreach (TBW_Production_Set tps in spawnListDefault )
             {
-                Thing thing = ThingMaker.MakeThing(Props.thingToSpawn);
-                thing.stackCount = Props.spawnCount;
-                if (thing == null)
+                int outputLocal = tps.output + this.cachedMultiPawnsHolder.currentPawnNum * tps.outputAddPerPawn;
+                if (TryFindSpawnCell(parent, tps.spawnDef, outputLocal, out var result))
                 {
-                    Log.Error("Could not spawn anything for " + parent);
+                    Thing thing = ThingMaker.MakeThing(tps.spawnDef);
+                    thing.stackCount = outputLocal;
+                    if (thing == null)
+                    {
+                        Log.Error("Could not spawn anything for " + parent);
+                    }
+                    if (Props.inheritFaction && thing.Faction != parent.Faction)
+                    {
+                        thing.SetFaction(parent.Faction);
+                    }
+                    GenPlace.TryPlaceThing(thing, result, parent.Map, ThingPlaceMode.Direct, out var lastResultingThing);
+                    if (Props.spawnForbidden)
+                    {
+                        lastResultingThing.SetForbidden(value: true);
+                    }
+                    if (Props.showMessageIfOwned && parent.Faction == Faction.OfPlayer)
+                    {
+                        Messages.Message("MessageCompSpawnerSpawnedItem".Translate(thingToSpawn.LabelCap), thing, MessageTypeDefOf.PositiveEvent);
+                    }
                 }
-                if (Props.inheritFaction && thing.Faction != parent.Faction)
+                else
                 {
-                    thing.SetFaction(parent.Faction);
+                    Log.Error("Could not find spawn cell for " + parent);
+                    continue;
                 }
-                GenPlace.TryPlaceThing(thing, result, parent.Map, ThingPlaceMode.Direct, out var lastResultingThing);
-                if (Props.spawnForbidden)
-                {
-                    lastResultingThing.SetForbidden(value: true);
-                }
-                if (Props.showMessageIfOwned && parent.Faction == Faction.OfPlayer)
-                {
-                    Messages.Message("MessageCompSpawnerSpawnedItem".Translate(Props.thingToSpawn.LabelCap), thing, MessageTypeDefOf.PositiveEvent);
-                }
-                return true;
             }
-            return false;
+            
+            return true;
         }
 
         public virtual bool TryFindSpawnCell(Thing parent, ThingDef thingToSpawn, int spawnCount, out IntVec3 result)
@@ -164,10 +222,20 @@ namespace TBW
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
+            /*
+            Command_Action command = new Command_Action();
+            command.defaultLabel = "DEV: Spawn " + thingToSpawn.label;
+            command.icon = TexCommand.DesirePower;
+            command.action = delegate
+            {
+            
+            };
+            yield return command;
+            */
             if (DebugSettings.ShowDevGizmos)
             {
                 Command_Action command_Action = new Command_Action();
-                command_Action.defaultLabel = "DEV: Spawn " + Props.thingToSpawn.label;
+                command_Action.defaultLabel = "DEV: Spawn " + thingToSpawn.label;
                 command_Action.icon = TexCommand.DesirePower;
                 command_Action.action = delegate
                 {
@@ -181,7 +249,7 @@ namespace TBW
         {
             if (Props.writeTimeLeftToSpawn && (!Props.requiresPower || PowerOn))
             {
-                return "NextSpawnedItemIn".Translate(GenLabel.ThingLabel(Props.thingToSpawn, null, Props.spawnCount)).Resolve() + ": " + ticksUntilSpawn.ToStringTicksToPeriod().Colorize(ColoredText.DateTimeColor);
+                return "NextSpawnedItemIn".Translate(GenLabel.ThingLabel(thingToSpawn, null, spawnCount)).Resolve() + ": " + ticksUntilSpawn.ToStringTicksToPeriod().Colorize(ColoredText.DateTimeColor);
             }
             return null;
         }
@@ -196,11 +264,13 @@ namespace TBW
         
         public List<Upgrade_Utility> UpgradeResearchProjs;
 
-        public ThingDef thingToSpawn;
+        //public ThingDef thingToSpawn;
 
-        public int spawnCount = 1;
+        //public int spawnCount = 1;
 
-        public IntRange spawnIntervalRange = new IntRange(100, 100);
+        //public IntRange spawnIntervalRange = new IntRange(100, 100);
+
+        public int tickstoSpawnDefault;
 
         public int spawnMaxAdjacent = -1;
 
@@ -208,7 +278,7 @@ namespace TBW
 
         public bool requiresPower;
 
-        public bool writeTimeLeftToSpawn;
+        public bool writeTimeLeftToSpawn = true;
 
         public bool showMessageIfOwned;
 
@@ -216,7 +286,37 @@ namespace TBW
 
         public bool inheritFaction;
 
+        public bool useDefaultSpawnTick = true;
 
+        public List<TBW_Production_Set> spawnList;
 
     }
+
+    public class TBW_Production_Set
+    {
+        public ThingDef spawnDef;
+
+        public int tickstoSpawn;
+
+        public int output;
+
+        public int outputAddPerPawn;
+
+        public float outputMultiplier = 1f;
+
+        public bool shouldSpawn = true;
+
+        public TBW_Production_Set Copy()
+        {
+            TBW_Production_Set copy = new TBW_Production_Set();
+            copy.spawnDef = spawnDef; 
+            copy.tickstoSpawn = tickstoSpawn; 
+            copy.output = output;
+            copy.outputAddPerPawn = outputAddPerPawn; 
+            copy.shouldSpawn = shouldSpawn;
+            copy.outputMultiplier = outputMultiplier;
+            return copy;
+        }
+    }
+
 }

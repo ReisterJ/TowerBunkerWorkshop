@@ -155,7 +155,7 @@ namespace TBW
             }
         }
 
-        public virtual void GarrisonFireCoolDownTick()
+        public void GarrisonFireCoolDownTick()
         {
             this.burstCooldownTicksLeft = (CachedTempGarrisonTroopNum > 0 ?
                             this.burstCooldownTicksLeft - this.Props.CDTicksReducePerPawn * CachedTempGarrisonTroopNum :
@@ -218,6 +218,7 @@ namespace TBW
             }
 
         }
+       
         public override void PostPostMake()
         {
             base.PostPostMake();

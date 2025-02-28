@@ -7,14 +7,23 @@ using Verse;
 
 namespace TBW
 {
-    public class Upgrade_Utility
+    public abstract class Upgrade_Utility
     {
        
         public ResearchProjectDef research;
 
-        public float factor;
-
         public string Upgrade_desc;
         
+    }
+
+    public class Upgrade_BioReactor : Upgrade_Utility
+    {
+        public float powerOutputPerPawnMultiplier;
+
+        public float powerOutputMultiplier;
+
+        public float powerOutputPerPawnOffset;
+
+        public float powerOutputOffset;
     }
 }

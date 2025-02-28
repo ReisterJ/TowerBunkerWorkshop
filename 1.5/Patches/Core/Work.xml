@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+    <Operation Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[defName="ElectricStove"]/recipes</xpath>
+            <value>
+                <li>TBW_Make_Fermentation_Chaff</li>
+            </value>
+    </Operation>
+    
+    <Operation Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[defName="FueledStove"]/recipes</xpath>
+            <value>
+                <li>TBW_Make_Fermentation_Chaff</li>
+            </value>
+    </Operation>
+</Patch>
