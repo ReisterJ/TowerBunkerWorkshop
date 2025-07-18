@@ -11,15 +11,18 @@ using Verse.Sound;
 
 namespace TBW
 {
-    public class Comp_TBW_MultiPawnsHolder : ThingComp, IThingHolder , ISuspendableThingHolder
+    public class Comp_TBW_MultiPawnsHolder : ThingComp, IThingHolder, ISuspendableThingHolder
     {
         protected ThingOwner innerContainer;
-        
+
         protected List<Pawn> insidePawns = new List<Pawn>();
 
         protected List<Thing> insideThings = new List<Thing>();
 
-        public List<Pair<Pawn,int>> pawnHolderTickRecord = new List<Pair<Pawn,int>>();
+        public IReadOnlyList<Pawn> getPawns => insidePawns;
+        protected bool allowSlaveAndPrisoner => Props.allowSlaveAndPrisoner;
+
+        public List<Pair<Pawn, int>> pawnHolderTickRecord = new List<Pair<Pawn, int>>();
 
         public int maxPawnNumOffset = 0;
         //private int startTick = -1;
@@ -38,12 +41,12 @@ namespace TBW
                 }
             }
         }
-        public Comp_TBW_MultiPawnsHolder() 
+        public Comp_TBW_MultiPawnsHolder()
         {
             innerContainer = new ThingOwner<Thing>(this);
         }
-        
-        public virtual int maxPawnNum
+
+        public int maxPawnNum
         {
             get
             {
@@ -57,7 +60,7 @@ namespace TBW
                 return (CompProperties_TBW_MultiPawnsHolder)this.props;
             }
         }
-        public virtual bool IsContentsSuspended
+        public bool IsContentsSuspended
         {
             get
             {
@@ -78,6 +81,33 @@ namespace TBW
                 Job job = JobMaker.MakeJob(TBW_JobDefOf.EnterMultiPawnsHolder, parent);
                 pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
             });
+            if (!allowSlaveAndPrisoner) yield break;
+            List<Pawn> pawnstoCarry = SlaveAndPrisonerPawnstoCarry(pawn);
+            if (null != pawnstoCarry)
+            {
+                foreach (Pawn takee in pawnstoCarry)
+                {
+                    if (null != takee)
+                    {
+                        utility.ifDebugLog(takee.Name, true);
+                        string carryText = "Carry" + takee.Name.ToString() + " to " + this.parent.def.label.ToString();
+                        yield return new FloatMenuOption(carryText.Translate(), delegate
+                            {
+                                utility.ifDebugLog("make job TBW_JobDefOf.CarrytoMultiPawnsHolder", true);
+                                Job job2 = JobMaker.MakeJob(TBW_JobDefOf.CarrytoMultiPawnsHolder, parent, takee);
+                                job2.count = 1;
+                                pawn.jobs.TryTakeOrderedJob(job2, JobTag.Misc);
+                            }
+                        );
+                    }
+                }
+            }
+        }
+
+        protected List<Pawn> SlaveAndPrisonerPawnstoCarry(Pawn worker)
+        {
+            List<Pawn> pawnlist = worker.Map.mapPawns.SlavesAndPrisonersOfColonySpawned.Where((Pawn x) => x != worker).ToList();
+            return pawnlist;
         }
         public void GetChildHolders(List<IThingHolder> outChildren)
         {
@@ -94,7 +124,6 @@ namespace TBW
             {
                 destMap = parent.Map;
             }
-            utility.ifDebugLog($"Pawn num of {this.parent.def.defName.ToString()} is {this.currentPawnNum}.Ejecting all pawns.");
             IntVec3 dropPoint = parent.InteractionCell != null ? parent.InteractionCell : parent.Position;
             innerContainer.TryDropAll(dropPoint, destMap, ThingPlaceMode.Near);
             this.insidePawns.Clear();
@@ -109,6 +138,56 @@ namespace TBW
             }
             innerContainer.ClearAndDestroyContents();
             base.PostDestroy(mode, previousMap);
+        }
+
+        protected void ClearAllPawn()
+        {
+            List<Pawn> insidePawnstemp = new List<Pawn>();
+            int tempCount = insidePawns.Count;
+            for (int i = 0; i < tempCount; i++) { 
+                insidePawnstemp.Add(insidePawns[i]);
+            }
+            for (int i = 0; i < tempCount; i++)
+            {
+                DropPawn(insidePawnstemp[i]);
+            }
+            if(0 != insidePawns.Count)
+            {
+                Log.Warning("Container cleared but still got pawns inside");
+            }
+            if(0 != pawnHolderTickRecord.Count)
+            {
+                Log.Warning("Container tick record cleared but still got record remaining");
+            }
+        }
+        public virtual void DropPawn(Pawn pawn)
+        {
+            if(null != pawn)
+            {
+                if (insidePawns.Contains(pawn))
+                {
+                    insidePawns.Remove(pawn);
+                }
+                else {
+                    Log.Error( pawn.Name + " is not in this container");
+                }
+
+                int tempCount = pawnHolderTickRecord.Count;
+                for (int i=0;i<tempCount;i++)
+                {
+                    if (pawnHolderTickRecord[i].First == pawn)
+                    {
+                        OnLeavingBuilding(pawn);
+                        pawnHolderTickRecord.RemoveAt(i);
+
+                    }
+                }
+            }
+        }
+        protected void OnLeavingBuilding(Pawn pawn)
+        {
+            //todo
+            return;
         }
         public override void PostDeSpawn(Map map)
         {
@@ -128,14 +207,9 @@ namespace TBW
         }
         public virtual bool CanAcceptPawn(Pawn pawn)
         {
-#if DEBUG
-            string pawns = "pawn";
-            if (currentPawnNum > 1) pawns = "pawns";
-            Log.Message("this building has " + currentPawnNum.ToString() + " " + pawns + ". Max capacity is " + maxPawnNum.ToString());
-#endif
-            if(this.currentPawnNum < this.maxPawnNum)
+            if (this.currentPawnNum < this.maxPawnNum)
             {
-                utility.ifDebugLog("Can accept pawn "+ pawn.Name.ToStringFull );
+                utility.ifDebugLog("Can accept pawn " + pawn.Name.ToStringFull);
                 return true;
             }
             utility.ifDebugLog("Can't accept pawn " + pawn.Name.ToStringFull);
@@ -144,14 +218,14 @@ namespace TBW
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
-            if (base.parent.Faction == Faction.OfPlayer && innerContainer.Count() > 0 )
+            if (base.parent.Faction == Faction.OfPlayer && innerContainer.Count() > 0)
             {
                 Command_Action command_Action = new Command_Action();
                 command_Action.action = delegate
                 {
                     EjectContents();
 
-                };    
+                };
                 command_Action.defaultLabel = "CommandEject";
                 command_Action.defaultDesc = "CommandEjectDesc";
                 if (innerContainer.Count == 0)
@@ -160,45 +234,50 @@ namespace TBW
                 }
                 command_Action.icon = ContentFinder<Texture2D>.Get("UI/Commands/PodEject");
                 yield return command_Action;
-            }   
-            if (DebugSettings.ShowDevGizmos) {  
-                yield break; 
+            }
+            if (DebugSettings.ShowDevGizmos) {
+                yield break;
             }
         }
 
+        
         public virtual bool TryAcceptPawn(Pawn pawn)
         {
             if (!CanAcceptPawn(pawn)) return false;
             bool num = pawn.DeSpawnOrDeselect();
-#if DEBUG
-            Log.Message(pawn.Name);
-#endif
-            if (this.GetDirectlyHeldThings().TryAdd(pawn))
+
+            if (this.GetDirectlyHeldThings().TryAddOrTransfer(pawn))
             {
                 this.insidePawns.Add(pawn);
-#if DEBUG
-                Log.Message("add " + pawn.Name.ToString() + " to " + this.parent.def.defName.ToString());
-#endif
-                Pair<Pawn,int> tempRecord = new Pair<Pawn, int>(pawn,Find.TickManager.TicksThisFrame);
-                
+                Pair<Pawn, int> tempRecord = new Pair<Pawn, int>(pawn, Find.TickManager.TicksThisFrame);
+                this.pawnHolderTickRecord.Add(tempRecord);
                 if (num)
                 {
                     Find.Selector.Select(pawn, playSound: false, forceDesignatorDeselect: false);
+                    
                 }
                 return true;
             }
 
-            return false; 
+            return false;
+        }
+        public override string CompInspectStringExtra()
+        {
+            string holder = "Holder";
+            string text = holder.Translate() + " : " + currentPawnNum.ToString() + " / " + maxPawnNum.ToString();
+            return text;
         }
     }
 
-    public class CompProperties_TBW_MultiPawnsHolder : CompProperties 
+    public class CompProperties_TBW_MultiPawnsHolder : CompProperties
     {
         public CompProperties_TBW_MultiPawnsHolder() {
             this.compClass = typeof(Comp_TBW_MultiPawnsHolder);
         }
-        public int baseMaxPawnNum;
+        public int baseMaxPawnNum = 4;//for list size optimization
         public bool isSuspended = true;
-
+        public bool allowSlaveAndPrisoner = true;
     }
+
+    
 }

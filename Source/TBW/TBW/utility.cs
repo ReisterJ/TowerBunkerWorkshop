@@ -36,5 +36,14 @@ namespace TBW
 #endif
         }
 
+        public enum HoldPawnOffsetTags
+        {
+            skills,
+            gender,
+            age,
+            bodysize,
+            conciousness,
+            nutrition
+        }
     }
 }

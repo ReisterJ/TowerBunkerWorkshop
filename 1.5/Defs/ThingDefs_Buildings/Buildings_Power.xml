@@ -42,9 +42,9 @@
         <comps>
         <li Class="TBW.CompProperties_TBW_BioReactor">
             <compClass>TBW.Comp_TBW_BioReactor</compClass>
-            <basePowerConsumption>-800</basePowerConsumption>
+            <basePowerConsumption>-1200</basePowerConsumption>
             <transmitsPower>true</transmitsPower>
-            <powerOutputPerPawn>500</powerOutputPerPawn>
+            <powerOutputPerPawn>800</powerOutputPerPawn>
             <nutritionConsumptionMultiplier>1.2</nutritionConsumptionMultiplier>
             <!-- <soundAmbientProducingPower>WoodFiredGenerator_Ambience</soundAmbientProducingPower> -->
         </li>
@@ -53,8 +53,8 @@
             <isSuspended>true</isSuspended>
         </li>
         <li Class="CompProperties_Refuelable">
-            <fuelConsumptionRate>15.0</fuelConsumptionRate>
-            <fuelCapacity>150.0</fuelCapacity>
+            <fuelConsumptionRate>20.0</fuelConsumptionRate>
+            <fuelCapacity>120.0</fuelCapacity>
             <fuelFilter>
             <thingDefs>
                 <li>TBW_Fermentation_Chaff</li>

@@ -25,6 +25,20 @@
         <killedLeavings>
             <ChunkSlagSteel>1</ChunkSlagSteel>
         </killedLeavings>
+        <damageMultipliers>
+            <li>
+                <damageDef>Bullet</damageDef>
+                <multiplier>0.8</multiplier>
+            </li>
+            <li>
+                <damageDef>Cut</damageDef>
+                <multiplier>0.5</multiplier>
+            </li>
+            <li>
+                <damageDef>Stab</damageDef>
+                <multiplier>0.5</multiplier>
+            </li>
+        </damageMultipliers>
         <comps>
             <li Class="CompProperties_Forbiddable"/>
             <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
@@ -104,6 +118,20 @@
         <killedLeavings>
             <ChunkSlagSteel>2</ChunkSlagSteel>
         </killedLeavings>
+        <damageMultipliers>
+            <li>
+                <damageDef>Bullet</damageDef>
+                <multiplier>0.4</multiplier>
+            </li>
+            <li>
+                <damageDef>Cut</damageDef>
+                <multiplier>0.2</multiplier>
+            </li>
+            <li>
+                <damageDef>Stab</damageDef>
+                <multiplier>0.2</multiplier>
+            </li>
+        </damageMultipliers>
         <comps>
             <li Class="CompProperties_Forbiddable"/>
             <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
@@ -191,7 +219,7 @@
         <damageMultipliers>
             <li>
                 <damageDef>Bullet</damageDef>
-                <multiplier>0.5</multiplier>
+                <multiplier>0.4</multiplier>
             </li>
             <li>
                 <damageDef>Cut</damageDef>
@@ -249,7 +277,7 @@
         <AccuracyTouch>0.95</AccuracyTouch>
         <AccuracyShort>0.90</AccuracyShort>
         <AccuracyMedium>0.80</AccuracyMedium>
-        <AccuracyLong>0.6</AccuracyLong>
+        <AccuracyLong>0.78</AccuracyLong>
         </statBases>
         <verbs>
         <li>
@@ -260,6 +288,7 @@
             <soundCastTail>GunTail_Heavy</soundCastTail>
             <muzzleFlashScale>9</muzzleFlashScale>
             <defaultCooldownTime>2.0</defaultCooldownTime>
+            <burstShotCount>3</burstShotCount>
             <ticksBetweenBurstShots>30</ticksBetweenBurstShots>
         </li>
         </verbs>
@@ -277,7 +306,7 @@
             <damageAmountBase>20</damageAmountBase>
             <speed>90</speed>
             <stoppingPower>3</stoppingPower>
-            <armorPenetrationBase>0.40</armorPenetrationBase>
+            <armorPenetrationBase>0.60</armorPenetrationBase>
             <!-- <flyOverhead>true</flyOverhead> -->
         </projectile>
     </ThingDef>

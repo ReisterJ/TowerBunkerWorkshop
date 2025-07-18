@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+    <Operation Class="PatchOperationFindMod">
+        <mods>
+            <li>Cumpilation</li>
+        </mods>
+        <match Class="PatchOperationAdd">
+            <xpath>Defs</xpath>
+                <value>
+                    <ThingDef ParentName="TBW_ProductionBase" >
+                        <defName>TBW_Milk_Chamber</defName>
+                        <label>Milk chamber</label>
+                        <description>Human production facility.</description>
+                        <statBases>
+                        <MaxHitPoints>600</MaxHitPoints>
+                        <Flammability>0.6</Flammability>
+                        <Mass>100</Mass>
+                        <Beauty>0</Beauty>
+                        <WorkToBuild>12000</WorkToBuild>
+                        </statBases>
+                        <graphicData>
+                            <texPath>Things/Building/Production/HydroponicsBasin</texPath>
+                            <graphicClass>Graphic_Multi</graphicClass>
+                            <drawSize>(2,4)</drawSize>
+                            <color>(192,192,192)</color>
+                        </graphicData>
+                        <size>(1,4)</size>
+                        <tickerType>Normal</tickerType>
+                        <comps>
+                            <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
+                                <baseMaxPawnNum>4</baseMaxPawnNum>
+                                <isSuspended>true</isSuspended>
+                            </li>
+                            <li Class="TBW.CompProperties_TBW_Production">
+                                <spawnList>
+                                    <li>
+                                        <spawnDef>Cumpilation_Cum</spawnDef>
+                                        <output>0</output>
+                                        <outputAddPerPawn>20</outputAddPerPawn>
+                                    </li>
+                                    <li>
+                                        <spawnDef>Milk</spawnDef>
+                                        <output>0</output>
+                                        <outputAddPerPawn>30</outputAddPerPawn>
+                                    </li>
+                                </spawnList>
+                                <tickstoSpawnDefault>120000</tickstoSpawnDefault>
+                                <requiresPower>true</requiresPower>
+                            </li>
+                            <li Class="CompProperties_Refuelable">
+                                <fuelConsumptionRate>4.0</fuelConsumptionRate>
+                                <fuelCapacity>20.0</fuelCapacity>
+                                <fuelFilter>
+                                <thingDefs>
+                                    <li>HumpShroom</li>
+                                </thingDefs>
+                                </fuelFilter>
+                                <showAllowAutoRefuelToggle>true</showAllowAutoRefuelToggle>
+                            </li>
+                            <li Class="CompProperties_Power">
+                                <compClass>CompPowerTrader</compClass>
+                                <shortCircuitInRain>false</shortCircuitInRain>
+                                <basePowerConsumption>300</basePowerConsumption>
+                            </li>
+                        </comps>
+                        <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+                        <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+                    </ThingDef>
+                </value>
+        </match>
+    </Operation>
+    
+    
+</Patch>

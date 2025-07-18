@@ -17,6 +17,9 @@
     <building>
       
     </building>
+    <inspectorTabs>
+      <li>TBW.ITab_HolderContent</li>
+    </inspectorTabs>
     <damageMultipliers>
         <li>
             <damageDef>Flame</damageDef>
@@ -72,6 +75,12 @@
     </stuffCategories>
     <costStuffCount>400</costStuffCount>
     <designationCategory>Security</designationCategory>
+    <inspectorTabs>
+      <li>TBW.ITab_HolderContent</li>
+    </inspectorTabs>
+    <placeWorkers>
+      <li>PlaceWorker_NotUnderRoof</li>
+    </placeWorkers>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
     <constructionSkillPrerequisite>10</constructionSkillPrerequisite>
   </ThingDef>
@@ -88,6 +97,10 @@
     <building>
       
     </building>
+    <designationCategory>Production</designationCategory>
+    <inspectorTabs>
+      <li>TBW.ITab_HolderContent</li>
+    </inspectorTabs>
     <placeWorkers>
       <li>PlaceWorker_NotUnderRoof</li>
     </placeWorkers>

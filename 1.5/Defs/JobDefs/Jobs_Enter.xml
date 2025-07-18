@@ -6,4 +6,12 @@
         <reportString>Enter building.</reportString>
         <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
     </JobDef>
+
+    <JobDef>
+        <defName>CarrytoMultiPawnsHolder</defName>
+        <driverClass>TBW.JobDriver_CarrytoMultiPawnsHolder</driverClass>
+        <reportString>Carry someone to building.</reportString>
+        <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+    </JobDef>
+
 </Defs>

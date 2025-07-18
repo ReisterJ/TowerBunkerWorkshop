@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,9 +12,17 @@ namespace TBW
     {
         protected float stuffConsumptionPerDayBase;
 
-        public float stuffConsumptionPerDayMultiplier;
+        protected bool PowerOn;
 
-        public List<ConsumptionType> consumptionList;
+        protected float stuffConsumptionPerDayMultiplier = 1f;
+
+        //protected List<ConsumptionType> consumptionList ;
+
+        public List<ConsumptionWorker> consumptionWorkerList = new List<ConsumptionWorker>();
+
+        protected bool Operational;
+
+        protected Comp_TBW_MultiPawnsHolder cachedCompMultiPawnsHolder;
 
         public CompProperties_TBW_Consumption Props
         {
@@ -22,9 +31,28 @@ namespace TBW
                 return (CompProperties_TBW_Consumption)this.props;
             }
         }
+
+        public void InitConsumptionWorker()
+        {
+            foreach (ConsumptionType consumptionType in Props.consumptionList)
+            {
+                ConsumptionWorker worker = new ConsumptionWorker();
+                worker.consumptionType = consumptionType;
+                worker.currentFuel = 0;
+                consumptionWorkerList.Add(worker);
+            }
+        }
+        public override void PostSpawnSetup(bool respawningAfterLoad)
+        {
+            base.PostSpawnSetup(respawningAfterLoad);
+            cachedCompMultiPawnsHolder = parent.TryGetComp<Comp_TBW_MultiPawnsHolder>();
+            InitConsumptionWorker();
+            PowerOn = parent.GetComp<CompPowerTrader>()?.PowerOn ?? false;
+        }
         public override void CompTick()
         {
             base.CompTick();
+            
         }
 
         public override void PostExposeData()
@@ -33,9 +61,44 @@ namespace TBW
 
         }
 
-        public virtual void ConsumeProcess()
+        public bool ShouldWork(ConsumptionWorker consumptionWorker)
+        {
+            if(consumptionWorker.consumptionType.critical && ( consumptionWorker.currentFuel <= 0))
+            {
+                //Operational = false;
+                return false;
+            }
+            return true;
+
+        }
+        public void Process()
+        {
+            foreach ( ConsumptionWorker consumptionWorker in consumptionWorkerList )
+            {
+                if (ShouldWork(consumptionWorker))
+                {
+                    ConsumptionType consumptionType = consumptionWorker.consumptionType;
+                    float amount = consumptionType.stuffConsumptionPerDay;
+                    if (consumptionType.rateModifiedByPawnNum)
+                    {
+                        amount *= GetConsumptionMultiplier() * consumptionType.consumptionMultiplierPerPawn;
+                    }
+                    consumptionWorker.ConsumeProcess(amount);
+                }
+                else { return; }
+            }
+        }
+
+       
+
+        public float GetConsumptionMultiplier()
         {
 
+            if( null != cachedCompMultiPawnsHolder )
+            {
+                return stuffConsumptionPerDayMultiplier * cachedCompMultiPawnsHolder.currentPawnNum;
+            }
+            return stuffConsumptionPerDayMultiplier;
         }
     }
     public class CompProperties_TBW_Consumption : CompProperties
@@ -69,6 +132,9 @@ namespace TBW
 
         public bool critical;
 
+        public float maxCapacity;
+
+        public bool rateModifiedByPawnNum = false;
         public ConsumptionType Copy()
         {
             ConsumptionType copy = new ConsumptionType()
@@ -80,5 +146,32 @@ namespace TBW
             };
             return copy;
         }
+    }
+    public class ConsumptionWorker
+    {
+        public ConsumptionType consumptionType;
+
+        public float currentFuel;
+
+        public void Refuel(float amout)
+        {
+            if (currentFuel + amout > consumptionType.maxCapacity)
+            {
+                currentFuel = consumptionType.maxCapacity;
+            }
+            else
+            {
+                if(currentFuel + amout > currentFuel)
+                {
+                    currentFuel = currentFuel + amout;
+                }
+            }
+        }
+        public virtual void ConsumeProcess(float amout)
+        {
+            currentFuel = ( ( ( currentFuel - amout )  > 0) && ( ( currentFuel - amout ) < currentFuel )
+                ? currentFuel - amout : 0f);
+        }
+
     }
 }

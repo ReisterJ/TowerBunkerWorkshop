@@ -13,5 +13,7 @@ namespace TBW
     {
 
         public static JobDef EnterMultiPawnsHolder;
+
+        public static JobDef CarrytoMultiPawnsHolder;
     }
 }

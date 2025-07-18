@@ -108,7 +108,8 @@ namespace TBW
     {
         public float powerOutputPerPawn;
         public float nutritionConsumptionMultiplier;
-
+        
+      
     }
 
 }
