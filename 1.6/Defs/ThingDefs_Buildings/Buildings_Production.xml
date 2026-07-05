@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <ThingDef ParentName="TBW_ProductionBase" >
+        <defName>TBW_Hydroponic_Chamber</defName>
+        <label>Hydroponic chamber</label>
+        <description>Large hydroponic crop growth facility.</description>
+        <statBases>
+        <MaxHitPoints>600</MaxHitPoints>
+        <Flammability>0.6</Flammability>
+        <Mass>100</Mass>
+        <Beauty>0</Beauty>
+        <WorkToBuild>12000</WorkToBuild>
+        </statBases>
+        <graphicData>
+            <texPath>Things/Buildings/Production/Greenhouse</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(4,4)</drawSize>
+            <damageData>
+                <cornerTL>Damage/Corner</cornerTL>
+                <cornerTR>Damage/Corner</cornerTR>
+                <cornerBL>Damage/Corner</cornerBL>
+                <cornerBR>Damage/Corner</cornerBR>
+            </damageData>
+        </graphicData>
+        <size>(4,4)</size>
+        <tickerType>Normal</tickerType>
+        <comps>
+            <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
+                <baseMaxPawnNum>4</baseMaxPawnNum>
+                <isSuspended>true</isSuspended>
+            </li>
+            <li Class="TBW.CompProperties_TBW_Production">
+                <spawnList>
+                    <li>
+                        <spawnDef>RawPotatoes</spawnDef>
+                        <output>100</output>
+                    </li>
+                    <li>
+                        <spawnDef>RawRice</spawnDef>
+                        <output>100</output>
+                    </li>
+                </spawnList>
+                <skillOutputBonuses>
+                    <li>
+                        <skillDef>Plants</skillDef>
+                        <outputAddPerLevel>20</outputAddPerLevel>
+                    </li>
+                </skillOutputBonuses>
+                <tickstoSpawnDefault>240000</tickstoSpawnDefault>
+                <requiresPower>true</requiresPower>
+            </li>
+            <li Class="CompProperties_Power">
+                <compClass>CompPowerTrader</compClass>
+                <shortCircuitInRain>false</shortCircuitInRain>
+                <basePowerConsumption>600</basePowerConsumption>
+            </li>
+        </comps>
+        <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+        <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    </ThingDef>
+
+    <ThingDef ParentName="BuildingBase">
+        <defName>TBW_Biomass_Processor</defName>
+        <label>Biomass processor</label>
+        <description>Processes unwanted organic matter into fermentation chaff. By default, it accepts rotten and desiccated corpses, while foods must be enabled manually.</description>
+        <thingClass>Building</thingClass>
+        <drawerType>MapMeshAndRealTime</drawerType>
+        <hasInteractionCell>true</hasInteractionCell>
+        <graphicData>
+            <texPath>Things/Buildings/Production/Bioprocessor</texPath>
+            <graphicClass>Graphic_Single</graphicClass>
+            <drawSize>(3,3)</drawSize>
+            <shadowData>
+                <volume>(1.93,1,1.69)</volume>
+                <offset>(-0.03,0,-0.1)</offset>
+            </shadowData>
+        </graphicData>
+        <altitudeLayer>Building</altitudeLayer>
+        <passability>PassThroughOnly</passability>
+        <fillPercent>0.9</fillPercent>
+        <pathCost>50</pathCost>
+        <rotatable>false</rotatable>
+        <blockWind>true</blockWind>
+        <castEdgeShadows>false</castEdgeShadows>
+        <statBases>
+            <MaxHitPoints>500</MaxHitPoints>
+            <WorkToBuild>7000</WorkToBuild>
+            <Flammability>0.3</Flammability>
+            <Beauty>-10</Beauty>
+            <Mass>100</Mass>
+        </statBases>
+        <tickerType>Rare</tickerType>
+        <canOverlapZones>false</canOverlapZones>
+        <size>(3,3)</size>
+        <building>
+            <destroySound>BuildingDestroyed_Metal_Medium</destroySound>
+        </building>
+        <costList>
+            <Steel>180</Steel>
+            <ComponentIndustrial>4</ComponentIndustrial>
+        </costList>
+        <comps>
+            <li Class="TBW.CompProperties_TBW_BiomassProcessor">
+                <maxNutrition>100</maxNutrition>
+                <nutritionConsumedPerRareTick>0.1</nutritionConsumedPerRareTick>
+                <chaffProducedPerRareTick>1</chaffProducedPerRareTick>
+                <minChaffToHaul>20</minChaffToHaul>
+                <fixedIngredientFilter>
+                    <categories>
+                        <li>Corpses</li>
+                        <li>Foods</li>
+                    </categories>
+                    <disallowedCategories>
+                        <li>CorpsesMechanoid</li>
+                    </disallowedCategories>
+                </fixedIngredientFilter>
+                <defaultIngredientFilter>
+                    <categories>
+                        <li>Corpses</li>
+                    </categories>
+                    <disallowedCategories>
+                        <li>CorpsesMechanoid</li>
+                    </disallowedCategories>
+                    <specialFiltersToAllow>
+                        <li>AllowRotten</li>
+                        <li>AllowCorpsesStranger</li>
+                        <li MayRequire="Ludeon.RimWorld.Ideology">AllowCorpsesSlave</li>
+                        <li MayRequire="Ludeon.RimWorld.Anomaly">AllowCorpsesUnnatural</li>
+                    </specialFiltersToAllow>
+                    <specialFiltersToDisallow>
+                        <li>AllowFresh</li>
+                        <li>AllowCorpsesColonist</li>
+                    </specialFiltersToDisallow>
+                </defaultIngredientFilter>
+            </li>
+            <li Class="CompProperties_Power">
+                <compClass>CompPowerTrader</compClass>
+                <shortCircuitInRain>false</shortCircuitInRain>
+                <basePowerConsumption>400</basePowerConsumption>
+            </li>
+            <li Class="CompProperties_Flickable"/>
+            <li Class="CompProperties_Breakdownable"/>
+        </comps>
+        <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
+        <designationCategory>Production</designationCategory>
+        <uiOrder>8000</uiOrder>
+        <constructEffect>ConstructMetal</constructEffect>
+        <researchPrerequisites>
+            <li>BiofuelRefining</li>
+        </researchPrerequisites>
+        <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
+    </ThingDef>
+
+</Defs>

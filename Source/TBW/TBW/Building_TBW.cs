@@ -80,7 +80,7 @@ namespace TBW
             return false;
         }
 
-        public override void Tick()
+        protected override void Tick()
         {
             base.Tick();
         }

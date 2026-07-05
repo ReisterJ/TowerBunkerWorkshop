@@ -32,12 +32,12 @@ namespace TBW
         public override void CompTick()
         {
             base.CompTick();
-            innerContainer.ThingOwnerTick();
+            innerContainer.DoTick();
             if (IsContentsSuspended)
             {
                 foreach (Pawn pawn in insidePawns)
                 {
-                    pawn.ageTracker.AgeTick();
+                    pawn.ageTracker.AgeTickInterval(1);
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace TBW
             {
                 destMap = parent.Map;
             }
-            IntVec3 dropPoint = parent.InteractionCell != null ? parent.InteractionCell : parent.Position;
+            IntVec3 dropPoint = parent.InteractionCell.IsValid ? parent.InteractionCell : parent.Position;
             innerContainer.TryDropAll(dropPoint, destMap, ThingPlaceMode.Near);
             this.insidePawns.Clear();
         }
@@ -189,9 +189,10 @@ namespace TBW
             //todo
             return;
         }
-        public override void PostDeSpawn(Map map)
+        public override void PostDeSpawn(Map map, DestroyMode mode)
         {
             EjectContents(map);
+            base.PostDeSpawn(map, mode);
         }
 
         public override void PostExposeData()

@@ -12,5 +12,9 @@ namespace TBW
     public static class TBW_ThingDefOf
     {
         public static ThingDef TBW_WatchTower_Medieval;
+
+        public static ThingDef TBW_Biomass_Processor;
+
+        public static ThingDef TBW_Fermentation_Chaff;
     }
 }

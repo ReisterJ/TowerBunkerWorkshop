@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <JobDef>
+        <defName>EnterMultiPawnsHolder</defName>
+        <driverClass>TBW.JobDriver_EnterMultiPawnsHolder</driverClass>
+        <reportString>Enter building.</reportString>
+        <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+    </JobDef>
+
+    <JobDef>
+        <defName>CarrytoMultiPawnsHolder</defName>
+        <driverClass>TBW.JobDriver_CarrytoMultiPawnsHolder</driverClass>
+        <reportString>Carry someone to building.</reportString>
+        <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+    </JobDef>
+
+    <JobDef>
+        <defName>CarryBiomassToProcessor</defName>
+        <driverClass>TBW.JobDriver_CarryBiomassToProcessor</driverClass>
+        <reportString>Carrying biomass to processor.</reportString>
+        <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+    </JobDef>
+
+    <JobDef>
+        <defName>TakeChaffFromBiomassProcessor</defName>
+        <driverClass>TBW.JobDriver_TakeChaffFromBiomassProcessor</driverClass>
+        <reportString>Taking fermentation chaff from processor.</reportString>
+        <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+    </JobDef>
+
+</Defs>

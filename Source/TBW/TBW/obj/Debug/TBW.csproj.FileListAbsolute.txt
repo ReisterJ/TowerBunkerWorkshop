@@ -12,3 +12,11 @@ E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.c
 E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.csproj.CoreCompileInputs.cache
 E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.dll
 E:\workstation\rimworld\dev\Tower Bunker Workshop\Source\TBW\TBW\obj\Debug\TBW.pdb
+E:\workstation\rimworld\dev\Tower Bunker Workshop\1.6\Assemblies\TBW.dll
+E:\workstation\rimworld\dev\Tower Bunker Workshop\1.6\Assemblies\TBW.pdb
+C:\Users\CodexSandboxOffline\.codex\.sandbox\cwd\c48631a0eb7c96db\1.6\Assemblies\TBW.dll
+C:\Users\CodexSandboxOffline\.codex\.sandbox\cwd\c48631a0eb7c96db\1.6\Assemblies\TBW.pdb
+C:\Users\CodexSandboxOffline\.codex\.sandbox\cwd\c48631a0eb7c96db\Source\TBW\TBW\obj\Debug\TBW.csproj.AssemblyReference.cache
+C:\Users\CodexSandboxOffline\.codex\.sandbox\cwd\c48631a0eb7c96db\Source\TBW\TBW\obj\Debug\TBW.csproj.CoreCompileInputs.cache
+C:\Users\CodexSandboxOffline\.codex\.sandbox\cwd\c48631a0eb7c96db\Source\TBW\TBW\obj\Debug\TBW.dll
+C:\Users\CodexSandboxOffline\.codex\.sandbox\cwd\c48631a0eb7c96db\Source\TBW\TBW\obj\Debug\TBW.pdb

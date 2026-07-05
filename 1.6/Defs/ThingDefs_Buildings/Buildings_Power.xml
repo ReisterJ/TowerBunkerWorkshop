@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <ThingDef ParentName="BuildingBase">
+        <defName>TBW_BioReactor</defName>
+        <label>Bio reactor</label>
+        <description>This reactor generates more power with more people inside./br (My life for YURI!)</description>
+        <thingClass>Building</thingClass>
+        <drawerType>MapMeshAndRealTime</drawerType>
+        <hasInteractionCell>true</hasInteractionCell>
+        <graphicData>
+        <texPath>Things/Buildings/Production/Biogenerator</texPath>
+        <graphicClass>Graphic_Single</graphicClass>
+        <drawSize>(3,3)</drawSize>
+        <shadowData>
+            <volume>(1.93,1,1.69)</volume>
+            <offset>(-0.03,0,-0.1)</offset>
+        </shadowData>
+        </graphicData>
+        <altitudeLayer>Building</altitudeLayer>
+        <passability>PassThroughOnly</passability>
+        <fillPercent>0.9</fillPercent>
+        <pathCost>60</pathCost>
+        <rotatable>false</rotatable>
+        <blockWind>true</blockWind>
+        <castEdgeShadows>false</castEdgeShadows>
+        <statBases>
+        <MaxHitPoints>500</MaxHitPoints>
+        <WorkToBuild>12000</WorkToBuild>
+        <Flammability>0.3</Flammability>
+        <Beauty>-20</Beauty>
+        </statBases>
+        <tickerType>Normal</tickerType>
+        <canOverlapZones>false</canOverlapZones>
+        <size>(3,3)</size>
+        <building>
+        <destroySound>BuildingDestroyed_Metal_Medium</destroySound>
+        </building>
+        <costList>
+        <Steel>400</Steel>
+        <Plasteel>50</Plasteel>
+        <ComponentIndustrial>10</ComponentIndustrial>
+        </costList>
+        <comps>
+        <li Class="TBW.CompProperties_TBW_BioReactor">
+            <compClass>TBW.Comp_TBW_BioReactor</compClass>
+            <basePowerConsumption>-2000</basePowerConsumption>
+            <transmitsPower>true</transmitsPower>
+            <powerOutputPerPawn>1000</powerOutputPerPawn>
+            <nutritionConsumptionMultiplier>1.2</nutritionConsumptionMultiplier>
+            <!-- <soundAmbientProducingPower>WoodFiredGenerator_Ambience</soundAmbientProducingPower> -->
+        </li>
+        <li Class="TBW.CompProperties_TBW_MultiPawnsHolder">
+            <baseMaxPawnNum>5</baseMaxPawnNum>
+            <isSuspended>true</isSuspended>
+        </li>
+        <li Class="CompProperties_Refuelable">
+            <fuelConsumptionRate>40.0</fuelConsumptionRate>
+            <fuelCapacity>500.0</fuelCapacity>
+            <fuelFilter>
+            <thingDefs>
+                <li>TBW_Fermentation_Chaff</li>
+            </thingDefs>
+            </fuelFilter>
+            <showAllowAutoRefuelToggle>true</showAllowAutoRefuelToggle>
+        </li>
+        <li Class="CompProperties_Glower">
+            <glowRadius>8</glowRadius>
+            <glowColor>(217,112,33,0)</glowColor>
+        </li>
+        <!-- <li Class="CompProperties_HeatPusher">
+            <compClass>CompHeatPusherPowered</compClass>
+            <heatPerSecond>6</heatPerSecond>
+        </li> -->
+        <!-- <li Class="CompProperties_Stunnable">
+            <useLargeEMPEffecter>true</useLargeEMPEffecter>
+            <affectedDamageDefs>
+            <li>EMP</li>
+            </affectedDamageDefs>
+        </li> -->
+        </comps>
+        <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
+        <designationCategory>Power</designationCategory>
+        <uiOrder>8000</uiOrder>
+        <constructEffect>ConstructMetal</constructEffect>
+        <researchPrerequisites>
+        <li>Electricity</li>
+        <li>GrowthVats</li>
+        </researchPrerequisites>
+        <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
+    </ThingDef>
+
+    <ThingDef ParentName="BuildingBase">
+        <defName>TBW_StorageBatteryStation</defName>
+        <label>Storage Battery Station</label>
+        <description>Stores electricity for later use.</description>
+        <drawerType>MapMeshAndRealTime</drawerType>
+        <thingClass>Building_Battery</thingClass>
+        <graphicData>
+        <texPath>Things/Building/Power/Battery</texPath>
+        <graphicClass>Graphic_Multi</graphicClass>
+        <drawSize>(2,4)</drawSize>
+        </graphicData>
+        <altitudeLayer>Building</altitudeLayer>
+        <passability>Impassable</passability>
+        <blockLight>true</blockLight>
+        <blockWind>true</blockWind>
+        <castEdgeShadows>true</castEdgeShadows>
+        <fillPercent>1</fillPercent>
+        <tickerType>Normal</tickerType>
+        <!-- <minifiedDef>MinifiedThing</minifiedDef> -->
+        <statBases>
+            <MaxHitPoints>500</MaxHitPoints>
+            <WorkToBuild>12000</WorkToBuild>
+            <Mass>100</Mass>
+            <Flammability>0.5</Flammability>
+            <Beauty>-10</Beauty>
+            <MarketValue>1000</MarketValue>
+        </statBases>
+        <size>(2,4)</size>
+        <building>
+            <destroySound>BuildingDestroyed_Metal_Medium</destroySound>
+        </building>
+        <costList>
+            <Steel>300</Steel>
+            <Plasteel>100</Plasteel>
+            <ComponentIndustrial>20</ComponentIndustrial>
+            <ComponentSpacer>10</ComponentSpacer>
+            <Gold>50</Gold>
+        </costList>
+        <comps>
+        <li Class="CompProperties_Battery">
+            <storedEnergyMax>12000</storedEnergyMax>
+            <efficiency>0.8</efficiency>
+            <shortCircuitInRain>false</shortCircuitInRain>
+            <transmitsPower>true</transmitsPower>
+        </li>
+        <!-- <li Class="CompProperties_Breakdownable"/> -->
+        </comps>
+        <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+        <designationCategory>Power</designationCategory>
+        <staticSunShadowHeight>0.2</staticSunShadowHeight>
+        <constructEffect>ConstructMetal</constructEffect>
+        <canOverlapZones>false</canOverlapZones>
+        <researchPrerequisites>
+        <li>Batteries</li>
+
+        </researchPrerequisites>
+    </ThingDef>
+</Defs>

@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"rimsage-mcp-server": {
+			"url": "https://mcp.rimsage.com/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}

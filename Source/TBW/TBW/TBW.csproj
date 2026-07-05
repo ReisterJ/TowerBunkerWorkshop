@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\1.5\Assemblies\</OutputPath>
+    <OutputPath>..\..\..\1.6\Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>none</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -65,7 +65,9 @@
     <Compile Include="Comp_TBW_BioReactor.cs" />
     <Compile Include="Comp_TBW_Consumption.cs" />
     <Compile Include="Comp_TBW_Production.cs" />
+    <Compile Include="Comp_TBW_BiomassProcessor.cs" />
     <Compile Include="JobDriver_EnterMultiPawnsHolder.cs" />
+    <Compile Include="JobDriver_TBW_BiomassProcessor.cs" />
     <Compile Include="Comp_TBW_MultiPawnsHolder.cs" />
     <Compile Include="Comp_TBW_GarrisonFire.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="utility.cs" />
     <Compile Include="JobDriver_CarrytoMultiPawnsHolder.cs" />
     <Compile Include="WorkGiver_EnterMultiPawnsHolder.cs" />
+    <Compile Include="WorkGiver_TBW_BiomassProcessor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

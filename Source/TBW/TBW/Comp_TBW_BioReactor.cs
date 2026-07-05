@@ -90,9 +90,9 @@ namespace TBW
         {
             base.PostExposeData();
         }
-        public override void PostDeSpawn(Map map)
+        public override void PostDeSpawn(Map map, DestroyMode mode)
         {
-            base.PostDeSpawn(map);
+            base.PostDeSpawn(map, mode);
         }
 
         public virtual float PowerOutputPerPawnMultiplier 

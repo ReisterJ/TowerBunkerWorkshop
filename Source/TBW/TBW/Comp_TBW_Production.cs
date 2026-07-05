@@ -57,19 +57,14 @@ namespace TBW
                 ResetCountdown();
             }
 
-            if(thingToSpawn == null)
-            {
-                thingToSpawn = Props.spawnList.FirstOrDefault().spawnDef;
-                spawnCount = Props.spawnList.FirstOrDefault().output;
-            }
             if (spawnListDefault.Count() == 0)
             {
                 foreach (TBW_Production_Set tps in Props.spawnList)
                 {
-                    this.spawnListDefault.Add(tps);
+                    this.spawnListDefault.Add(tps.Copy());
                 }
             }
-            
+            RefreshSelectedProductionPreview();
         }
         /*
         public override void comptickrare()
@@ -110,7 +105,7 @@ namespace TBW
         public virtual void SpawnTick(int interval)
         {
             int tickReduction = interval;
-            int pawnNum = cachedMultiPawnsHolder.currentPawnNum;
+            int pawnNum = cachedMultiPawnsHolder?.currentPawnNum ?? 0;
             if (pawnNum >= 5)
             {
                 tickReduction = interval * 2;
@@ -130,9 +125,76 @@ namespace TBW
                 TryDoSpawn();
             }
         }
+        protected TBW_Production_Set GetSelectedProductionSet()
+        {
+            return spawnListDefault.FirstOrDefault((TBW_Production_Set x) => x.spawnDef == thingToSpawn) ?? spawnListDefault.FirstOrDefault();
+        }
+        protected void RefreshSelectedProductionPreview()
+        {
+            currentSet = GetSelectedProductionSet();
+            if (currentSet == null)
+            {
+                thingToSpawn = null;
+                spawnCount = 0;
+                return;
+            }
+            thingToSpawn = currentSet.spawnDef;
+            spawnCount = GetOutputForSet(currentSet);
+        }
+        protected bool UsesSkillBasedOutput()
+        {
+            return Props.skillOutputBonuses != null && Props.skillOutputBonuses.Count > 0;
+        }
+        protected int GetOutputForSet(TBW_Production_Set productionSet)
+        {
+            if (productionSet == null || productionSet.spawnDef == null)
+            {
+                return 0;
+            }
+
+            int outputLocal = productionSet.output;
+            if (UsesSkillBasedOutput())
+            {
+                if (cachedMultiPawnsHolder != null)
+                {
+                    foreach (Pawn pawn in cachedMultiPawnsHolder.getPawns)
+                    {
+                        if (pawn?.skills == null)
+                        {
+                            continue;
+                        }
+                        foreach (TBW_ProductionSkillBonus skillOutputBonus in Props.skillOutputBonuses)
+                        {
+                            if (skillOutputBonus?.skillDef == null)
+                            {
+                                continue;
+                            }
+                            SkillRecord skillRecord = pawn.skills.GetSkill(skillOutputBonus.skillDef);
+                            if (skillRecord != null)
+                            {
+                                outputLocal += skillRecord.Level * skillOutputBonus.outputAddPerLevel;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                outputLocal += (cachedMultiPawnsHolder?.currentPawnNum ?? 0) * productionSet.outputAddPerPawn;
+            }
+
+            return Mathf.Max(0, outputLocal);
+        }
         public virtual bool TryDoSpawn()
         {
             if (!parent.Spawned)
+            {
+                return false;
+            }
+            RefreshSelectedProductionPreview();
+            TBW_Production_Set productionSet = currentSet;
+            int outputLocal = GetOutputForSet(productionSet);
+            if (productionSet?.spawnDef == null || outputLocal <= 0)
             {
                 return false;
             }
@@ -160,24 +222,21 @@ namespace TBW
                     }
                 }
             }
-            foreach (TBW_Production_Set tps in spawnListDefault )
+
+            if(outputLocal <= productionSet.spawnDef.stackLimit)
             {
-                int outputLocal = tps.output + this.cachedMultiPawnsHolder.currentPawnNum * tps.outputAddPerPawn;
-                if(outputLocal <= tps.spawnDef.stackLimit)
-                {
-                    SpawnThing(tps.spawnDef, outputLocal);
-                    continue;
-                }
-                int mod = outputLocal % tps.spawnDef.stackLimit;
-                int stacknum = outputLocal / tps.spawnDef.stackLimit;
-                for (int i = 0; i < stacknum; i++) 
-                {
-                    SpawnThing(tps.spawnDef , tps.spawnDef.stackLimit);
-                }
-                if( 0 != mod )
-                {
-                    SpawnThing(tps.spawnDef, mod);
-                }
+                SpawnThing(productionSet.spawnDef, outputLocal);
+                return true;
+            }
+            int mod = outputLocal % productionSet.spawnDef.stackLimit;
+            int stacknum = outputLocal / productionSet.spawnDef.stackLimit;
+            for (int i = 0; i < stacknum; i++) 
+            {
+                SpawnThing(productionSet.spawnDef , productionSet.spawnDef.stackLimit);
+            }
+            if( 0 != mod )
+            {
+                SpawnThing(productionSet.spawnDef, mod);
             }
             
             return true;
@@ -250,9 +309,10 @@ namespace TBW
         }
         public override void PostExposeData()
         {
+            base.PostExposeData();
             string text = (Props.saveKeysPrefix.NullOrEmpty() ? null : (Props.saveKeysPrefix + "_"));
             Scribe_Values.Look(ref ticksUntilSpawn, text + "ticksUntilSpawn", 0);
-            Scribe_Deep.Look(ref thingToSpawn, "thingToSpawn");
+            Scribe_Defs.Look(ref thingToSpawn, "thingToSpawn");
             Scribe_Values.Look(ref spawnCount, "spawnCount");
         }
 
@@ -274,11 +334,12 @@ namespace TBW
             {
                 yield return item;
             }
-            if ( this.parent.Faction == Faction.OfPlayer)
+            if ( this.parent.Faction == Faction.OfPlayer && spawnListDefault.Count > 0)
             {
                 Command_Action chooseCommand = new Command_Action();
-                chooseCommand.defaultLabel = thingToSpawn.label;
-                chooseCommand.icon = thingToSpawn.uiIcon;
+                RefreshSelectedProductionPreview();
+                chooseCommand.defaultLabel = thingToSpawn?.label ?? "Select production";
+                chooseCommand.icon = thingToSpawn?.uiIcon;
                 chooseCommand.action = delegate
                 {
                     List<FloatMenuOption> list = new List<FloatMenuOption>();
@@ -289,14 +350,15 @@ namespace TBW
                                 delegate
                                 {
                                     this.thingToSpawn = tps.spawnDef;
-                                    chooseCommand.defaultLabel = this.thingToSpawn.label;
-                                    chooseCommand.icon = this.thingToSpawn.uiIcon;
+                                    RefreshSelectedProductionPreview();
+                                    chooseCommand.defaultLabel = this.thingToSpawn?.label ?? chooseCommand.defaultLabel;
+                                    chooseCommand.icon = this.thingToSpawn?.uiIcon;
 
                                 }
                             );
                         list.Add( floatMenuOption );
                     }
-                    
+                    Find.WindowStack.Add(new FloatMenu(list));
 
                 };
                 yield return chooseCommand;
@@ -304,7 +366,8 @@ namespace TBW
             if (DebugSettings.ShowDevGizmos)
             {
                 Command_Action command_Action = new Command_Action();
-                command_Action.defaultLabel = "DEV: Spawn " + thingToSpawn.label;
+                RefreshSelectedProductionPreview();
+                command_Action.defaultLabel = "DEV: Spawn " + (thingToSpawn?.label ?? "none");
                 command_Action.icon = TexCommand.DesirePower;
                 command_Action.action = delegate
                 {
@@ -316,7 +379,8 @@ namespace TBW
         }
         public override string CompInspectStringExtra()
         {
-            if (Props.writeTimeLeftToSpawn && (!Props.requiresPower || PowerOn))
+            RefreshSelectedProductionPreview();
+            if (thingToSpawn != null && Props.writeTimeLeftToSpawn && (!Props.requiresPower || PowerOn))
             {
                 return "NextSpawnedItemIn".Translate(GenLabel.ThingLabel(thingToSpawn, null, spawnCount)).Resolve() +"x" + spawnCount.ToString() + ": " + ticksUntilSpawn.ToStringTicksToPeriod().Colorize(ColoredText.DateTimeColor);
             }
@@ -361,6 +425,8 @@ namespace TBW
 
         public List<TBW_Production_Set> spawnList;
 
+        public List<TBW_ProductionSkillBonus> skillOutputBonuses;
+
     }
 
     public class TBW_Production_Set
@@ -388,6 +454,13 @@ namespace TBW
             copy.outputMultiplier = outputMultiplier;
             return copy;
         }
+    }
+
+    public class TBW_ProductionSkillBonus
+    {
+        public SkillDef skillDef;
+
+        public int outputAddPerLevel;
     }
 
     

@@ -15,5 +15,9 @@ namespace TBW
         public static JobDef EnterMultiPawnsHolder;
 
         public static JobDef CarrytoMultiPawnsHolder;
+
+        public static JobDef CarryBiomassToProcessor;
+
+        public static JobDef TakeChaffFromBiomassProcessor;
     }
 }

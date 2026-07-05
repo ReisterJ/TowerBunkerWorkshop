@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <WorkGiverDef>
+    <defName>EnterMultiPawnsHolder</defName>
+    <label>enter multi pawns building</label>
+    <giverClass>TBW.WorkGiver_EnterMultiPawnsHolder</giverClass>
+    <verb>enter</verb>
+    <gerund>entering</gerund>
+    <priorityInType>90</priorityInType>
+    <requiredCapacities>
+      <li>Moving</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+
+  <WorkGiverDef>
+    <defName>HaulBiomassToProcessor</defName>
+    <label>haul biomass to processor</label>
+    <giverClass>TBW.WorkGiver_TBW_HaulBiomassToProcessor</giverClass>
+    <verb>haul</verb>
+    <gerund>hauling biomass to processor</gerund>
+    <workType>Hauling</workType>
+    <priorityInType>20</priorityInType>
+    <requiredCapacities>
+      <li>Manipulation</li>
+      <li>Moving</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+
+  <WorkGiverDef>
+    <defName>TakeChaffFromBiomassProcessor</defName>
+    <label>take fermentation chaff from processor</label>
+    <giverClass>TBW.WorkGiver_TBW_TakeChaffFromBiomassProcessor</giverClass>
+    <verb>haul</verb>
+    <gerund>taking fermentation chaff from processor</gerund>
+    <workType>Hauling</workType>
+    <priorityInType>19</priorityInType>
+    <requiredCapacities>
+      <li>Manipulation</li>
+      <li>Moving</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+</Defs>

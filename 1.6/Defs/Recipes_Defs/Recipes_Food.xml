@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <!-- <RecipeDef>
+        <defName>TBW_Make_Fermentation_Chaff</defName>
+        <label>make fermentation chaff</label>
+        <description>Make fermentation chaff.</description>
+        <jobString>Making fermentation chaff.</jobString>
+        <workAmount>300</workAmount>
+        <workSpeedStat>CookSpeed</workSpeedStat>
+        <effectWorking>Cook</effectWorking>
+        <soundWorking>Recipe_CookMeal</soundWorking>
+        <allowMixingIngredients>true</allowMixingIngredients>
+        <ingredientValueGetterClass>IngredientValueGetter_Nutrition</ingredientValueGetterClass>
+        <ingredients>
+        <li>
+            <filter>
+                <categories>
+                    <li>FoodRaw</li>
+                </categories>
+            </filter>
+            <count>1</count>
+        </li>
+        </ingredients>
+        <products>
+        <TBW_Fermentation_Chaff>40</TBW_Fermentation_Chaff>
+        </products>
+        <fixedIngredientFilter>
+        <categories>
+            <li>FoodRaw</li>
+        </categories>
+        <thingDefs>
+            <li>Hay</li>
+        </thingDefs>
+        </fixedIngredientFilter>
+        <defaultIngredientFilter>
+        <categories>
+            <li>Foods</li>
+        </categories>
+        <disallowedCategories>
+            <li>EggsFertilized</li>
+        </disallowedCategories>
+        <disallowedThingDefs>
+            <li>InsectJelly</li>
+        </disallowedThingDefs>
+        </defaultIngredientFilter>
+        <workSkill>Cooking</workSkill>
+    </RecipeDef> -->
+
+    <ThingDef ParentName="OrganicProductBase">
+        <defName>TBW_Fermentation_Chaff</defName>
+        <label>Fermentation Chaff</label>
+        <description>For bio reactor use. Humans can eat it, but they really, really don't like it.</description>
+        <thingCategories>
+        <li>Foods</li>
+        </thingCategories>
+        <graphicData>
+        <texPath>Things/Item/Resource/Kibble</texPath>
+        <color>(233,233,233)</color>
+        </graphicData>
+        <socialPropernessMatters>true</socialPropernessMatters>
+        <statBases>
+        <MarketValue>0.1</MarketValue>
+        <Mass>0.005</Mass>
+        <Nutrition>0.02</Nutrition>
+        <FoodPoisonChanceFixedHuman>0.4</FoodPoisonChanceFixedHuman>
+        </statBases>
+        <ingestible>
+        <foodType>Kibble</foodType>
+        <preferability>RawBad</preferability>
+        <tasteThought>AteKibble</tasteThought>
+        <optimalityOffsetHumanlikes>-100</optimalityOffsetHumanlikes>
+        <optimalityOffsetFeedingAnimals>15</optimalityOffsetFeedingAnimals>
+        <ingestEffect>EatVegetarian</ingestEffect>
+        <ingestSound>RawVegetable_Eat</ingestSound>
+        </ingestible>
+        <comps>
+        <li Class="CompProperties_Ingredients">
+            <performMergeCompatibilityChecks>false</performMergeCompatibilityChecks>
+            <noIngredientsFoodKind>Meat</noIngredientsFoodKind>
+        </li>
+        </comps>
+        <allowedArchonexusCount>200</allowedArchonexusCount>
+    </ThingDef>
+</Defs>
