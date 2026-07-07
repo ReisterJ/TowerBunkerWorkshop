@@ -30,16 +30,8 @@
                 <isSuspended>true</isSuspended>
             </li>
             <li Class="TBW.CompProperties_TBW_Production">
-                <spawnList>
-                    <li>
-                        <spawnDef>RawPotatoes</spawnDef>
-                        <output>100</output>
-                    </li>
-                    <li>
-                        <spawnDef>RawRice</spawnDef>
-                        <output>100</output>
-                    </li>
-                </spawnList>
+                <includeAllSowablePlantProducts>true</includeAllSowablePlantProducts>
+                <sowablePlantProductOutputPerYieldDay>50</sowablePlantProductOutputPerYieldDay>
                 <skillOutputBonuses>
                     <li>
                         <skillDef>Plants</skillDef>
@@ -102,6 +94,7 @@
         <comps>
             <li Class="TBW.CompProperties_TBW_BiomassProcessor">
                 <maxNutrition>100</maxNutrition>
+                <ingredientSearchRadius>60</ingredientSearchRadius>
                 <nutritionConsumedPerRareTick>0.1</nutritionConsumedPerRareTick>
                 <chaffProducedPerRareTick>1</chaffProducedPerRareTick>
                 <minChaffToHaul>20</minChaffToHaul>

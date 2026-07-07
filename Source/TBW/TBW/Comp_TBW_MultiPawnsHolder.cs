@@ -89,11 +89,11 @@ namespace TBW
                 {
                     if (null != takee)
                     {
-                        utility.ifDebugLog(takee.Name, true);
+                        // utility.ifDebugLog(takee.Name, true);
                         string carryText = "Carry" + takee.Name.ToString() + " to " + this.parent.def.label.ToString();
                         yield return new FloatMenuOption(carryText.Translate(), delegate
                             {
-                                utility.ifDebugLog("make job TBW_JobDefOf.CarrytoMultiPawnsHolder", true);
+                                // utility.ifDebugLog("make job TBW_JobDefOf.CarrytoMultiPawnsHolder", true);
                                 Job job2 = JobMaker.MakeJob(TBW_JobDefOf.CarrytoMultiPawnsHolder, parent, takee);
                                 job2.count = 1;
                                 pawn.jobs.TryTakeOrderedJob(job2, JobTag.Misc);

@@ -19,6 +19,8 @@ namespace TBW
 
         protected ThingDef thingToSpawn;
 
+        protected ThingDef sourcePlantToProduce;
+
         protected TBW_Production_Set currentSet;
 
         protected int tickstoSpawn ;
@@ -32,6 +34,8 @@ namespace TBW
         protected int spawnCount;
 
         protected Designator designator;
+
+        protected bool productionOptionsResolved;
 
         public List<TBW_Production_Set> spawnListDefault = new List<TBW_Production_Set>();
         public CompProperties_TBW_Production Props 
@@ -57,13 +61,7 @@ namespace TBW
                 ResetCountdown();
             }
 
-            if (spawnListDefault.Count() == 0)
-            {
-                foreach (TBW_Production_Set tps in Props.spawnList)
-                {
-                    this.spawnListDefault.Add(tps.Copy());
-                }
-            }
+            EnsureProductionOptions();
             RefreshSelectedProductionPreview();
         }
         /*
@@ -117,6 +115,106 @@ namespace TBW
         {
             ticksUntilSpawn = Props.tickstoSpawnDefault;
         }
+
+        protected void EnsureProductionOptions()
+        {
+            if (productionOptionsResolved)
+            {
+                return;
+            }
+
+            if (Props.spawnList != null)
+            {
+                foreach (TBW_Production_Set tps in Props.spawnList)
+                {
+                    AddOrUpdateProductionSet(tps);
+                }
+            }
+            if (Props.includeAllSowablePlantProducts)
+            {
+                AddSowablePlantProducts();
+            }
+            productionOptionsResolved = true;
+        }
+
+        protected void AddSowablePlantProducts()
+        {
+            List<ThingDef> thingDefs = DefDatabase<ThingDef>.AllDefsListForReading;
+            for (int i = 0; i < thingDefs.Count; i++)
+            {
+                ThingDef plantDef = thingDefs[i];
+                if (plantDef?.category != ThingCategory.Plant
+                    || plantDef.plant == null
+                    || !plantDef.plant.Sowable
+                    || !plantDef.plant.Harvestable
+                    || plantDef.plant.harvestedThingDef == null)
+                {
+                    continue;
+                }
+
+                AddProductionSetIfMissing(new TBW_Production_Set
+                {
+                    sourcePlantDef = plantDef,
+                    spawnDef = plantDef.plant.harvestedThingDef,
+                    output = GetOutputForSowablePlantProduct(plantDef)
+                });
+            }
+        }
+
+        protected int GetOutputForSowablePlantProduct(ThingDef plantDef)
+        {
+            if (plantDef?.plant == null || plantDef.plant.harvestedThingDef == null)
+            {
+                return Props.sowablePlantProductOutput;
+            }
+
+            float growDays = Mathf.Max(0.01f, plantDef.plant.growDays);
+            float outputPerGrowCycle = plantDef.plant.harvestYield / growDays * Props.sowablePlantProductOutputPerYieldDay;
+            return Mathf.Max(1, Mathf.RoundToInt(outputPerGrowCycle));
+        }
+
+        protected void AddOrUpdateProductionSet(TBW_Production_Set productionSet)
+        {
+            if (productionSet?.spawnDef == null)
+            {
+                return;
+            }
+
+            TBW_Production_Set existing = FindExistingProductionSet(productionSet);
+            if (existing == null)
+            {
+                spawnListDefault.Add(productionSet.Copy());
+                return;
+            }
+
+            existing.tickstoSpawn = productionSet.tickstoSpawn;
+            existing.sourcePlantDef = productionSet.sourcePlantDef;
+            existing.output = productionSet.output;
+            existing.outputAddPerPawn = productionSet.outputAddPerPawn;
+            existing.outputMultiplier = productionSet.outputMultiplier;
+            existing.shouldSpawn = productionSet.shouldSpawn;
+        }
+
+        protected void AddProductionSetIfMissing(TBW_Production_Set productionSet)
+        {
+            if (productionSet?.spawnDef == null || FindExistingProductionSet(productionSet) != null)
+            {
+                return;
+            }
+
+            spawnListDefault.Add(productionSet.Copy());
+        }
+
+        protected TBW_Production_Set FindExistingProductionSet(TBW_Production_Set productionSet)
+        {
+            if (productionSet?.sourcePlantDef != null)
+            {
+                return spawnListDefault.FirstOrDefault((TBW_Production_Set x) => x.sourcePlantDef == productionSet.sourcePlantDef);
+            }
+
+            return spawnListDefault.FirstOrDefault((TBW_Production_Set x) => x.sourcePlantDef == null && x.spawnDef == productionSet.spawnDef);
+        }
+
         protected virtual void CheckShouldSpawn()
         {
             if (ticksUntilSpawn <= 0)
@@ -127,6 +225,14 @@ namespace TBW
         }
         protected TBW_Production_Set GetSelectedProductionSet()
         {
+            if (sourcePlantToProduce != null)
+            {
+                TBW_Production_Set plantSet = spawnListDefault.FirstOrDefault((TBW_Production_Set x) => x.sourcePlantDef == sourcePlantToProduce);
+                if (plantSet != null)
+                {
+                    return plantSet;
+                }
+            }
             return spawnListDefault.FirstOrDefault((TBW_Production_Set x) => x.spawnDef == thingToSpawn) ?? spawnListDefault.FirstOrDefault();
         }
         protected void RefreshSelectedProductionPreview()
@@ -139,6 +245,7 @@ namespace TBW
                 return;
             }
             thingToSpawn = currentSet.spawnDef;
+            sourcePlantToProduce = currentSet.sourcePlantDef;
             spawnCount = GetOutputForSet(currentSet);
         }
         protected bool UsesSkillBasedOutput()
@@ -313,6 +420,7 @@ namespace TBW
             string text = (Props.saveKeysPrefix.NullOrEmpty() ? null : (Props.saveKeysPrefix + "_"));
             Scribe_Values.Look(ref ticksUntilSpawn, text + "ticksUntilSpawn", 0);
             Scribe_Defs.Look(ref thingToSpawn, "thingToSpawn");
+            Scribe_Defs.Look(ref sourcePlantToProduce, "sourcePlantToProduce");
             Scribe_Values.Look(ref spawnCount, "spawnCount");
         }
 
@@ -334,11 +442,12 @@ namespace TBW
             {
                 yield return item;
             }
+            EnsureProductionOptions();
             if ( this.parent.Faction == Faction.OfPlayer && spawnListDefault.Count > 0)
             {
                 Command_Action chooseCommand = new Command_Action();
                 RefreshSelectedProductionPreview();
-                chooseCommand.defaultLabel = thingToSpawn?.label ?? "Select production";
+                chooseCommand.defaultLabel = ProductionOptionLabel(currentSet);
                 chooseCommand.icon = thingToSpawn?.uiIcon;
                 chooseCommand.action = delegate
                 {
@@ -346,12 +455,18 @@ namespace TBW
                     foreach (TBW_Production_Set tps in spawnListDefault)
                     {
                         FloatMenuOption floatMenuOption = new FloatMenuOption(
-                                tps.spawnDef.label,
+                                ProductionOptionLabel(tps),
                                 delegate
                                 {
+                                    bool productionChanged = this.thingToSpawn != tps.spawnDef || this.sourcePlantToProduce != tps.sourcePlantDef;
                                     this.thingToSpawn = tps.spawnDef;
+                                    this.sourcePlantToProduce = tps.sourcePlantDef;
+                                    if (productionChanged)
+                                    {
+                                        ResetCountdown();
+                                    }
                                     RefreshSelectedProductionPreview();
-                                    chooseCommand.defaultLabel = this.thingToSpawn?.label ?? chooseCommand.defaultLabel;
+                                    chooseCommand.defaultLabel = ProductionOptionLabel(currentSet);
                                     chooseCommand.icon = this.thingToSpawn?.uiIcon;
 
                                 }
@@ -377,8 +492,25 @@ namespace TBW
                 yield return command_Action;
             }
         }
+
+        protected string ProductionOptionLabel(TBW_Production_Set productionSet)
+        {
+            if (productionSet?.spawnDef == null)
+            {
+                return "Select production";
+            }
+
+            if (productionSet.sourcePlantDef != null)
+            {
+                return productionSet.sourcePlantDef.label + " -> " + productionSet.spawnDef.label + " x" + GetOutputForSet(productionSet).ToString();
+            }
+
+            return productionSet.spawnDef.label + " x" + GetOutputForSet(productionSet).ToString();
+        }
+
         public override string CompInspectStringExtra()
         {
+            EnsureProductionOptions();
             RefreshSelectedProductionPreview();
             if (thingToSpawn != null && Props.writeTimeLeftToSpawn && (!Props.requiresPower || PowerOn))
             {
@@ -425,6 +557,12 @@ namespace TBW
 
         public List<TBW_Production_Set> spawnList;
 
+        public bool includeAllSowablePlantProducts;
+
+        public int sowablePlantProductOutput = 100;
+
+        public float sowablePlantProductOutputPerYieldDay = 50f;
+
         public List<TBW_ProductionSkillBonus> skillOutputBonuses;
 
     }
@@ -432,6 +570,8 @@ namespace TBW
     public class TBW_Production_Set
     {
         public ThingDef spawnDef;
+
+        public ThingDef sourcePlantDef;
 
         public int tickstoSpawn;
 
@@ -447,6 +587,7 @@ namespace TBW
         {
             TBW_Production_Set copy = new TBW_Production_Set();
             copy.spawnDef = spawnDef; 
+            copy.sourcePlantDef = sourcePlantDef;
             copy.tickstoSpawn = tickstoSpawn; 
             copy.output = output;
             copy.outputAddPerPawn = outputAddPerPawn; 
