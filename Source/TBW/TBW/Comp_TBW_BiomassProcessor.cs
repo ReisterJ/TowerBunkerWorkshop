@@ -444,6 +444,7 @@ namespace TBW
         public int chaffProducedPerRareTick = 2;
         public int minChaffToHaul = 2;
         public float corpseNutritionPerBodySize = 4f;
+        public float ingredientSearchRadius = 999f;
         public ThingFilter fixedIngredientFilter;
         public ThingFilter defaultIngredientFilter;
         public List<SpecialThingFilterDef> forceHiddenSpecialFilters;

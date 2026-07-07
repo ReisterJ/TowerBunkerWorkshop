@@ -59,8 +59,28 @@ namespace TBW
         public bool isGarrisoned 
         {
             get {
-                return pawnsGarrisoned.Count() > 0;
+                return GarrisonedPawnCount > 0;
             }  
+        }
+
+        protected int GarrisonedPawnCount
+        {
+            get
+            {
+                if (CachedComp_MultiPawnsHolder == null)
+                {
+                    Get_Parent_MultiPawnsHolderComp();
+                }
+                return CachedComp_MultiPawnsHolder?.currentPawnNum ?? pawnsGarrisoned.Count;
+            }
+        }
+
+        protected bool PowerOn
+        {
+            get
+            {
+                return parent.GetComp<CompPowerTrader>()?.PowerOn ?? false;
+            }
         }
 
         public Thing Thing
@@ -135,9 +155,20 @@ namespace TBW
                     { 
                         return false;
                     }
-                    if (!isGarrisoned && !this.fireAtWill)
+                    if (!isGarrisoned)
                     {
-                        return false;
+                        if (Props.requireGarrisonedPawnToShoot)
+                        {
+                            return false;
+                        }
+                        if (Props.requiresPowerWhenUngarrisoned && !PowerOn)
+                        {
+                            return false;
+                        }
+                        if (!this.fireAtWill)
+                        {
+                            return false;
+                        }
                     }
                 }
                 CompCanBeDormant compCanBeDormant = this.parent.TryGetComp<CompCanBeDormant>();
@@ -306,6 +337,8 @@ namespace TBW
 
         public ThingDef mainWeaponDef;
         public bool autoAttack = true;
+        public bool requireGarrisonedPawnToShoot;
+        public bool requiresPowerWhenUngarrisoned;
         public int CDTicksReducePerPawn = 1;
 
 

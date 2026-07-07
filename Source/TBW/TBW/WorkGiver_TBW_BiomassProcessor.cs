@@ -133,6 +133,13 @@ namespace TBW
                 return null;
             }
 
+            float searchRadius = processor.Props.ingredientSearchRadius;
+            if (searchRadius < 0f)
+            {
+                searchRadius = 0f;
+            }
+
+            IntVec3 searchRoot = processor.parent.def.hasInteractionCell ? processor.parent.InteractionCell : processor.parent.Position;
             foreach (ThingDef thingDef in processor.AllowedFilter.AllowedThingDefs)
             {
                 if (thingDef == null
@@ -144,13 +151,14 @@ namespace TBW
                 }
 
                 Thing found = GenClosest.ClosestThingReachable(
-                    pawn.Position,
+                    searchRoot,
                     pawn.Map,
                     ThingRequest.ForDef(thingDef),
                     PathEndMode.ClosestTouch,
                     TraverseParms.For(pawn),
-                    9999f,
-                    x => !x.IsForbidden(pawn) && pawn.CanReserve(x) && IsValidIngredient(pawn, processor, x, forced)
+                    searchRadius,
+                    x => !x.IsForbidden(pawn) && pawn.CanReserve(x) && IsValidIngredient(pawn, processor, x, forced),
+                    searchRegionsMax: 99999
                 );
                 if (found != null)
                 {
