@@ -94,7 +94,8 @@
         <comps>
             <li Class="TBW.CompProperties_TBW_BiomassProcessor">
                 <maxNutrition>100</maxNutrition>
-                <ingredientSearchRadius>60</ingredientSearchRadius>
+                <resumeIngredientHaulingNutrition>25</resumeIngredientHaulingNutrition>
+                <pauseIngredientHaulingNutrition>95</pauseIngredientHaulingNutrition>
                 <nutritionConsumedPerRareTick>0.1</nutritionConsumedPerRareTick>
                 <chaffProducedPerRareTick>1</chaffProducedPerRareTick>
                 <minChaffToHaul>20</minChaffToHaul>

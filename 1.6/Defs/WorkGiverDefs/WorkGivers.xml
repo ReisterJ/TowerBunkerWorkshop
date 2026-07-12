@@ -20,6 +20,7 @@
     <gerund>hauling biomass to processor</gerund>
     <workType>Hauling</workType>
     <priorityInType>20</priorityInType>
+    <directOrderable>false</directOrderable>
     <requiredCapacities>
       <li>Manipulation</li>
       <li>Moving</li>

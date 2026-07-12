@@ -8,20 +8,23 @@ using Verse.AI;
 
 namespace TBW
 {
-    public class Comp_TBW_BiomassProcessor : ThingComp
+    public class Comp_TBW_BiomassProcessor : ThingComp, IThingHolder, INotifyHauledTo
     {
         private ThingFilter allowedFilter;
         private ThingFilter fixedFilter;
+        private ThingOwner innerContainer;
         private float storedNutrition;
         private int storedChaff;
         private int filterVersion;
         private int nextTickToSearchForIngredients;
+        private bool ingredientHaulingAllowed = true;
+        private bool allowsFoodIngredientSearch;
+        private bool allowsCorpseIngredientSearch;
+        private static readonly List<Thing> tmpHeldIngredients = new List<Thing>();
 
         private static readonly CachedTexture ConfigureIcon = new CachedTexture("UI/Commands/LaunchShip");
         private static readonly CachedTexture EjectContentsIcon = new CachedTexture("UI/Commands/PodEject");
-        private static readonly IntRange ReCheckFailedIngredientTicksRange = new IntRange(500, 600);
         private const int CurrentFilterVersion = 3;
-        private const int FailedHaulRetryDelayTicks = 180;
 
         public CompProperties_TBW_BiomassProcessor Props => (CompProperties_TBW_BiomassProcessor)props;
 
@@ -37,8 +40,24 @@ namespace TBW
 
         public bool CanAcceptMoreNutrition => storedNutrition < MaxNutrition - 0.001f;
 
+        public bool CanRequestIngredientHaul => CanAcceptMoreNutrition && ingredientHaulingAllowed;
+
         public bool ShouldWaitToSearchForIngredients => Find.TickManager != null
-            && Find.TickManager.TicksGame <= nextTickToSearchForIngredients;
+            && Find.TickManager.TicksGame < nextTickToSearchForIngredients;
+
+        public bool AllowsFoodIngredientSearch => allowsFoodIngredientSearch;
+
+        public bool AllowsCorpseIngredientSearch => allowsCorpseIngredientSearch;
+
+        private float ResumeIngredientHaulingNutrition => Mathf.Clamp(
+            Mathf.Min(Props.resumeIngredientHaulingNutrition, Props.pauseIngredientHaulingNutrition),
+            0f,
+            MaxNutrition);
+
+        private float PauseIngredientHaulingNutrition => Mathf.Clamp(
+            Mathf.Max(Props.resumeIngredientHaulingNutrition, Props.pauseIngredientHaulingNutrition),
+            0f,
+            MaxNutrition);
 
         public ThingFilter AllowedFilter
         {
@@ -47,6 +66,11 @@ namespace TBW
                 EnsureFilters();
                 return allowedFilter;
             }
+        }
+
+        public Comp_TBW_BiomassProcessor()
+        {
+            innerContainer = new ThingOwner<Thing>(this);
         }
 
         public ThingFilter FixedFilter
@@ -62,28 +86,57 @@ namespace TBW
         {
             base.Initialize(props);
             EnsureFilters();
+            RefreshAllowedIngredientKinds();
         }
 
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
             base.PostSpawnSetup(respawningAfterLoad);
             EnsureFilters();
+            RefreshAllowedIngredientKinds();
+            ProcessHeldIngredients();
         }
 
         public override void PostExposeData()
         {
             base.PostExposeData();
             Scribe_Deep.Look(ref allowedFilter, "allowedFilter");
+            Scribe_Deep.Look(ref innerContainer, "innerContainer", this);
             Scribe_Values.Look(ref filterVersion, "filterVersion", 0);
             Scribe_Values.Look(ref storedNutrition, "storedNutrition", 0f);
             Scribe_Values.Look(ref storedChaff, "storedChaff", 0);
             Scribe_Values.Look(ref nextTickToSearchForIngredients, "nextTickToSearchForIngredients", 0);
+            Scribe_Values.Look(ref ingredientHaulingAllowed, "ingredientHaulingAllowed", true);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                if (innerContainer == null)
+                {
+                    innerContainer = new ThingOwner<Thing>(this);
+                }
+
                 EnsureFilters();
+                RepairFilterDisplay(fixedFilter);
+                RepairFilterDisplay(allowedFilter);
+                RefreshAllowedIngredientKinds();
                 storedNutrition = Mathf.Clamp(storedNutrition, 0f, MaxNutrition);
                 storedChaff = Mathf.Max(0, storedChaff);
+                UpdateIngredientHaulingLatch();
             }
+        }
+
+        public ThingOwner GetDirectlyHeldThings()
+        {
+            return innerContainer;
+        }
+
+        public void GetChildHolders(List<IThingHolder> outChildren)
+        {
+            ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, innerContainer);
+        }
+
+        public void Notify_HauledTo(Pawn hauler, Thing thing, int count)
+        {
+            ProcessHeldIngredients();
         }
 
         public override void CompTickRare()
@@ -102,6 +155,7 @@ namespace TBW
 
             storedNutrition = Mathf.Max(0f, storedNutrition - consumed);
             storedChaff += Props.chaffProducedPerRareTick;
+            UpdateIngredientHaulingLatch();
         }
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
@@ -151,57 +205,106 @@ namespace TBW
                 return;
             }
 
-            nextTickToSearchForIngredients = Find.TickManager.TicksGame + ReCheckFailedIngredientTicksRange.RandomInRange;
+            int retryDelay = Mathf.Max(1, Props.failedIngredientSearchRetryTicks.RandomInRange);
+            nextTickToSearchForIngredients = Find.TickManager.TicksGame + retryDelay;
         }
 
-        public void NotifyIngredientHaulFailed()
+        public void NotifyIngredientFilterChanged()
         {
-            if (Find.TickManager == null)
-            {
-                return;
-            }
-
-            nextTickToSearchForIngredients = Mathf.Max(nextTickToSearchForIngredients, Find.TickManager.TicksGame + FailedHaulRetryDelayTicks);
-        }
-
-        public void NotifyIngredientHaulSucceeded()
-        {
+            EnsureFilters();
+            RepairFilterDisplay(allowedFilter);
+            RefreshAllowedIngredientKinds();
             nextTickToSearchForIngredients = 0;
         }
 
         public bool CanAcceptIngredient(Thing thing)
         {
+            return CanAcceptIngredientForHauling(thing) && GetNutritionPerUnit(thing) > 0f;
+        }
+
+        public bool CanAcceptIngredientForHauling(Thing thing)
+        {
             return CanAcceptMoreNutrition
                 && thing != null
                 && !thing.Destroyed
                 && IsBiomassCandidate(thing)
-                && IsAllowedByFilter(thing)
-                && GetNutritionPerUnit(thing) > 0f;
+                && IsAllowedByFilter(thing);
         }
 
         public int GetAcceptStackCount(Thing thing)
         {
-            if (!CanAcceptIngredient(thing))
+            if (!CanAcceptIngredientForHauling(thing))
             {
                 return 0;
             }
 
             float nutritionPerUnit = GetNutritionPerUnit(thing);
+            if (nutritionPerUnit <= 0f)
+            {
+                return 0;
+            }
+
             int countByCapacity = Mathf.CeilToInt((MaxNutrition - storedNutrition) / nutritionPerUnit);
             return Mathf.Clamp(countByCapacity, 1, thing.stackCount);
         }
 
         public bool TryAcceptIngredient(Thing thing)
         {
-            if (!CanAcceptIngredient(thing))
+            if (!CanAcceptIngredientForHauling(thing))
             {
                 return false;
             }
 
-            storedNutrition = Mathf.Min(MaxNutrition, storedNutrition + GetNutrition(thing));
+            float nutritionPerUnit = GetNutritionPerUnit(thing);
+            if (nutritionPerUnit <= 0f)
+            {
+                return false;
+            }
+
+            storedNutrition = Mathf.Min(MaxNutrition, storedNutrition + nutritionPerUnit * thing.stackCount);
+            nextTickToSearchForIngredients = 0;
+            UpdateIngredientHaulingLatch();
             thing.Destroy(DestroyMode.Vanish);
-            NotifyIngredientHaulSucceeded();
             return true;
+        }
+
+        private void ProcessHeldIngredients()
+        {
+            if (innerContainer == null || !innerContainer.Any)
+            {
+                return;
+            }
+
+            tmpHeldIngredients.Clear();
+            tmpHeldIngredients.AddRange(innerContainer);
+            for (int i = 0; i < tmpHeldIngredients.Count; i++)
+            {
+                Thing ingredient = tmpHeldIngredients[i];
+                if (!TryAcceptIngredient(ingredient) && parent.Spawned)
+                {
+                    innerContainer.TryDrop(ingredient, parent.Position, parent.Map, ThingPlaceMode.Near, out Thing _);
+                }
+            }
+
+            tmpHeldIngredients.Clear();
+        }
+
+        private void UpdateIngredientHaulingLatch()
+        {
+            bool wasAllowed = ingredientHaulingAllowed;
+            if (storedNutrition <= ResumeIngredientHaulingNutrition)
+            {
+                ingredientHaulingAllowed = true;
+            }
+            else if (storedNutrition >= PauseIngredientHaulingNutrition)
+            {
+                ingredientHaulingAllowed = false;
+            }
+
+            if (!wasAllowed && ingredientHaulingAllowed)
+            {
+                nextTickToSearchForIngredients = 0;
+            }
         }
 
         public bool ReadyForHaulingChaff()
@@ -254,10 +357,6 @@ namespace TBW
                 fixedFilter = new ThingFilter();
                 ConfigureFixedFilter(fixedFilter);
             }
-            else
-            {
-                RepairFilterDisplay(fixedFilter);
-            }
 
             if (allowedFilter == null)
             {
@@ -270,9 +369,30 @@ namespace TBW
                 ConfigureDefaultAllowedFilter(allowedFilter);
                 filterVersion = CurrentFilterVersion;
             }
-            else
+        }
+
+        private void RefreshAllowedIngredientKinds()
+        {
+            allowsFoodIngredientSearch = false;
+            allowsCorpseIngredientSearch = false;
+            if (fixedFilter == null || allowedFilter == null)
             {
-                RepairFilterDisplay(allowedFilter);
+                return;
+            }
+
+            foreach (ThingDef thingDef in allowedFilter.AllowedThingDefs)
+            {
+                if (!fixedFilter.Allows(thingDef))
+                {
+                    continue;
+                }
+
+                allowsFoodIngredientSearch |= IsFoodThingDef(thingDef);
+                allowsCorpseIngredientSearch |= IsCorpseThingDef(thingDef);
+                if (allowsFoodIngredientSearch && allowsCorpseIngredientSearch)
+                {
+                    break;
+                }
             }
         }
 
@@ -368,7 +488,6 @@ namespace TBW
                 return;
             }
 
-            filter.RecalculateDisplayRootCategory();
             filter.DisplayRootCategory = ThingCategoryNodeDatabase.RootNode;
         }
 
@@ -403,12 +522,8 @@ namespace TBW
 
         private bool IsAllowedByFilter(Thing thing)
         {
-            return FixedFilter.Allows(thing) && AllowedFilter.Allows(thing);
-        }
-
-        private float GetNutrition(Thing thing)
-        {
-            return GetNutritionPerUnit(thing) * thing.stackCount;
+            EnsureFilters();
+            return fixedFilter.Allows(thing) && allowedFilter.Allows(thing);
         }
 
         private float GetNutritionPerUnit(Thing thing)
@@ -445,6 +560,9 @@ namespace TBW
         public int minChaffToHaul = 2;
         public float corpseNutritionPerBodySize = 4f;
         public float ingredientSearchRadius = 999f;
+        public float resumeIngredientHaulingNutrition = 25f;
+        public float pauseIngredientHaulingNutrition = 95f;
+        public IntRange failedIngredientSearchRetryTicks = new IntRange(600, 900);
         public ThingFilter fixedIngredientFilter;
         public ThingFilter defaultIngredientFilter;
         public List<SpecialThingFilterDef> forceHiddenSpecialFilters;
@@ -476,6 +594,12 @@ namespace TBW
         }
 
         public override Vector2 InitialSize => new Vector2(560f, 640f);
+
+        public override void PostClose()
+        {
+            base.PostClose();
+            processor.NotifyIngredientFilterChanged();
+        }
 
         public override void DoWindowContents(Rect inRect)
         {

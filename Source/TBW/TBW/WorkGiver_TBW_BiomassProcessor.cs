@@ -1,5 +1,5 @@
 using RimWorld;
-using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -14,22 +14,6 @@ namespace TBW
         public override Danger MaxPathDanger(Pawn pawn)
         {
             return Danger.Deadly;
-        }
-
-        public override bool ShouldSkip(Pawn pawn, bool forced = false)
-        {
-            Map map = pawn?.Map;
-            if (map == null)
-            {
-                return true;
-            }
-
-            return !HasUsableProcessor(map, pawn);
-        }
-
-        public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
-        {
-            return pawn?.Map?.listerThings.ThingsOfDef(TBW_ThingDefOf.TBW_Biomass_Processor);
         }
 
         public override bool HasJobOnThing(Pawn pawn, Thing t, bool forced = false)
@@ -63,52 +47,31 @@ namespace TBW
                 return null;
             }
 
-            return MakeCarryJob(ingredient, t, processor);
-        }
-
-        private static bool HasUsableProcessor(Map map, Pawn pawn)
-        {
-            List<Thing> processors = map.listerThings.ThingsOfDef(TBW_ThingDefOf.TBW_Biomass_Processor);
-            for (int i = 0; i < processors.Count; i++)
+            int acceptCount = processor.GetAcceptStackCount(ingredient);
+            if (acceptCount <= 0)
             {
-                Thing processorThing = processors[i];
-                Comp_TBW_BiomassProcessor processor = processorThing.TryGetComp<Comp_TBW_BiomassProcessor>();
-                if (processor != null
-                    && processor.CanAcceptMoreNutrition
-                    && !processor.ShouldWaitToSearchForIngredients
-                    && !processorThing.IsForbidden(pawn)
-                    && !processorThing.IsBurning()
-                    && map.designationManager.DesignationOn(processorThing, DesignationDefOf.Deconstruct) == null)
-                {
-                    return true;
-                }
+                NotifyIngredientSearchFailed(pawn, processor, forced);
+                return null;
             }
 
-            return false;
-        }
+            Job job = HaulAIUtility.HaulToContainerJob(pawn, ingredient, t);
+            if (job == null)
+            {
+                return null;
+            }
 
-        private Job MakeCarryJob(Thing ingredient, Thing processorThing, Comp_TBW_BiomassProcessor processor)
-        {
-            Job job = JobMaker.MakeJob(TBW_JobDefOf.CarryBiomassToProcessor, ingredient, processorThing);
-            job.count = processor.GetAcceptStackCount(ingredient);
-            job.haulOpportunisticDuplicates = false;
+            job.count = Mathf.Min(job.count, acceptCount);
             return job;
         }
 
-        private bool CanUseProcessor(Pawn pawn, Thing t, bool forced, out Comp_TBW_BiomassProcessor processor)
+        private static bool CanUseProcessor(Pawn pawn, Thing t, bool forced, out Comp_TBW_BiomassProcessor processor)
         {
             processor = t?.TryGetComp<Comp_TBW_BiomassProcessor>();
-            if (processor == null || !processor.CanAcceptMoreNutrition)
-            {
-                return false;
-            }
-
-            if (!forced && processor.ShouldWaitToSearchForIngredients)
-            {
-                return false;
-            }
-
-            if (t.Faction != pawn.Faction)
+            if (pawn == null
+                || processor == null
+                || !processor.CanRequestIngredientHaul
+                || (!forced && processor.ShouldWaitToSearchForIngredients)
+                || !pawn.CanReserve(t, 1, -1, null, forced))
             {
                 return false;
             }
@@ -118,62 +81,69 @@ namespace TBW
                 return false;
             }
 
-            if (t.IsForbidden(pawn) || t.IsBurning())
-            {
-                return false;
-            }
-
-            return pawn.CanReserve(t, 1, -1, null, forced);
+            return !t.IsForbidden(pawn) && !t.IsBurning();
         }
 
         private Thing FindIngredient(Pawn pawn, Comp_TBW_BiomassProcessor processor, bool forced)
         {
-            if (pawn?.Map == null || processor == null)
+            if (pawn?.Map == null)
             {
                 return null;
             }
 
-            float searchRadius = processor.Props.ingredientSearchRadius;
-            if (searchRadius < 0f)
+            Thing food = null;
+            if (processor.AllowsFoodIngredientSearch)
             {
-                searchRadius = 0f;
-            }
-
-            IntVec3 searchRoot = processor.parent.def.hasInteractionCell ? processor.parent.InteractionCell : processor.parent.Position;
-            foreach (ThingDef thingDef in processor.AllowedFilter.AllowedThingDefs)
-            {
-                if (thingDef == null
-                    || !Comp_TBW_BiomassProcessor.IsBiomassThingDef(thingDef)
-                    || !processor.FixedFilter.Allows(thingDef)
-                    || pawn.Map.listerThings.ThingsOfDef(thingDef).Count == 0)
-                {
-                    continue;
-                }
-
-                Thing found = GenClosest.ClosestThingReachable(
-                    searchRoot,
+                food = GenClosest.ClosestThingReachable(
+                    pawn.Position,
                     pawn.Map,
-                    ThingRequest.ForDef(thingDef),
+                    ThingRequest.ForGroup(ThingRequestGroup.FoodSourceNotPlantOrTree),
                     PathEndMode.ClosestTouch,
-                    TraverseParms.For(pawn),
-                    searchRadius,
-                    x => !x.IsForbidden(pawn) && pawn.CanReserve(x) && IsValidIngredient(pawn, processor, x, forced),
-                    searchRegionsMax: 99999
-                );
-                if (found != null)
-                {
-                    return found;
-                }
+                    TraverseParms.For(pawn, MaxPathDanger(pawn)),
+                    90f,
+                    Validator);
             }
 
-            return null;
-        }
+            Thing corpse = null;
+            if (processor.AllowsCorpseIngredientSearch)
+            {
+                corpse = GenClosest.ClosestThingReachable(
+                    pawn.Position,
+                    pawn.Map,
+                    ThingRequest.ForGroup(ThingRequestGroup.Corpse),
+                    PathEndMode.ClosestTouch,
+                    TraverseParms.For(pawn, MaxPathDanger(pawn)),
+                    90f,
+                    Validator);
+            }
 
-        private bool IsValidIngredient(Pawn pawn, Comp_TBW_BiomassProcessor processor, Thing thing, bool forced)
-        {
-            return processor.CanAcceptIngredient(thing)
-                && pawn.carryTracker.AvailableStackSpace(thing.def) > 0
-                && HaulAIUtility.PawnCanAutomaticallyHaulFast_NewTemp(pawn, thing, forced, checkReachability: false);
+            if (food == null)
+            {
+                return corpse;
+            }
+
+            if (corpse == null)
+            {
+                return food;
+            }
+
+            return (pawn.Position - food.Position).LengthHorizontalSquared <= (pawn.Position - corpse.Position).LengthHorizontalSquared
+                ? food
+                : corpse;
+
+            bool Validator(Thing thing)
+            {
+                if (thing.IsForbidden(pawn)
+                    || !thing.IsInValidStorage()
+                    || !processor.CanAcceptIngredientForHauling(thing)
+                    || !pawn.CanReserve(thing, 1, -1, null, forced))
+                {
+                    return false;
+                }
+
+                SlotGroup slotGroup = thing.GetSlotGroup();
+                return slotGroup?.parent != null && slotGroup.parent.HaulDestinationEnabled;
+            }
         }
 
         private static void NotifyIngredientSearchFailed(Pawn pawn, Comp_TBW_BiomassProcessor processor, bool forced)

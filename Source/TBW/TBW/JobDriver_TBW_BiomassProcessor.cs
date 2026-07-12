@@ -15,9 +15,8 @@ namespace TBW
 
         private Comp_TBW_BiomassProcessor Processor => job.GetTarget(ProcessorInd).Thing?.TryGetComp<Comp_TBW_BiomassProcessor>();
 
-        private void EndHaulJobWithCooldown()
+        private void EndHaulJob()
         {
-            Processor?.NotifyIngredientHaulFailed();
             EndJobWith(JobCondition.Incompletable);
         }
 
@@ -39,14 +38,14 @@ namespace TBW
                 Thing ingredient = Ingredient;
                 if (processor == null || ingredient == null || !processor.CanAcceptIngredient(ingredient))
                 {
-                    EndHaulJobWithCooldown();
+                    EndHaulJob();
                     return;
                 }
 
                 int carrySpace = pawn.carryTracker.AvailableStackSpace(ingredient.def);
                 if (carrySpace <= 0)
                 {
-                    EndHaulJobWithCooldown();
+                    EndHaulJob();
                     return;
                 }
 
@@ -54,7 +53,7 @@ namespace TBW
                 job.count = acceptCount < carrySpace ? acceptCount : carrySpace;
                 if (job.count <= 0)
                 {
-                    EndHaulJobWithCooldown();
+                    EndHaulJob();
                 }
             });
             yield return Toils_Goto.GotoThing(IngredientInd, PathEndMode.ClosestTouch)
@@ -73,7 +72,7 @@ namespace TBW
                 Thing carriedThing = pawn.carryTracker.CarriedThing;
                 if (processor == null || carriedThing == null || !processor.TryAcceptIngredient(carriedThing))
                 {
-                    EndHaulJobWithCooldown();
+                    EndHaulJob();
                 }
             });
         }
