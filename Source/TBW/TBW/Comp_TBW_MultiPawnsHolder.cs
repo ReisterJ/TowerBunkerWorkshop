@@ -172,8 +172,7 @@ namespace TBW
                     Log.Error( pawn.Name + " is not in this container");
                 }
 
-                int tempCount = pawnHolderTickRecord.Count;
-                for (int i=0;i<tempCount;i++)
+                for (int i = pawnHolderTickRecord.Count - 1; i >= 0; i--)
                 {
                     if (pawnHolderTickRecord[i].First == pawn)
                     {
